@@ -29,7 +29,7 @@ Simple Class System for JavaScript. Designed to work with backbone.js and node.j
 Browser:
 
 ```html
-<script src="unsercore.js"></script>
+<script src="underscore.js"></script>
 <script src="class.js"></script>
 ```
 
