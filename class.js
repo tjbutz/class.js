@@ -1,5 +1,5 @@
 /**
- * class.js v0.1
+ * class.js v0.1.1
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -8,7 +8,6 @@
  * License: https://github.com/tjbutz/class.js/LICENSE
  */
 (function() {
-  
   var root = this;
 
   var _ = root._;
@@ -23,7 +22,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.1';
+  Class.VERSION = '0.1.1';
 
   Class.noConflict = function() {
     root.Class = _Class;
@@ -33,7 +32,7 @@
 
   var tempConstructor = function() {};
 
-  var Class = {
+  _.extend(Class, {
 
     types : {
       "String" : _.isString,
@@ -269,13 +268,11 @@
          };
        }
      }
-  };
+  });
   
   
   var firstUp = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1);
   };
-
-  return Class;
 
 }).call(this);
