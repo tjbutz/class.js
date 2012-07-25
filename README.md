@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple Class System for JavaScript
+Simple Class System for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
 
@@ -11,7 +11,7 @@ Simple Class System for JavaScript
   * Properties
     * getter / setter
     * visibility
-  	* type check
+  	* type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex)
   	* format value
     * validation
     * init value
@@ -29,10 +29,15 @@ Simple Class System for JavaScript
 Browser:
 
 ```html
+<script src="unsercore.js"></script>
 <script src="class.js"></script>
 ```
 
 node.js:
+
+```
+npm install classjs
+```
 
 ```js
 require("classjs");
