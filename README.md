@@ -126,15 +126,15 @@ Class.define(superClass, {
     prop1 : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Simple property definition
     prop2 : {
                 type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Complex property definition
-        	      init : Mixed
-        	      format : "Function" | Function,
-        	      validate : "Function" | Function | ["Function"|Function],
-              	apply : "Function" | Function,
+                init : Mixed
+                format : "Function" | Function,
+                validate : "Function" | Function | ["Function"|Function],
+                apply : "Function" | Function,
               	set : true|false,
                 get : true|false,
               	nullable : true|false,
                 event : String
-              }	
+            }
     ...	
   },
   
