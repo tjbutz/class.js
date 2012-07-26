@@ -152,19 +152,32 @@
       }
 
       // add batch property set method
-      clazz.prototype.set = function(properties) {
+      clazz.prototype.set = this._createGenericSetter("set");
+      clazz.prototype._set = this._createGenericSetter("_set");
+    },
+
+
+    _createGenericSetter : function(prefix) {
+      return function(properties, value, fireEvent) {
+        if (_.isString(properties)) {
+          var property = properties;
+          properties = {};
+          properties[property] = value;
+        } else {
+          fireEvent = fireEvent || value;
+        }
         for (var property in properties) {
           var prop = firstUp(property);
-          var setter = "set" + prop;
+          var setter = prefix + prop;
           if (this[setter]) {
-            this[setter](properties[property]);
+            this[setter](properties[property], fireEvent);
           } else {
             throw new Error('No public set method for property "' + property + '" found.');
           }
 
         }
         return this;
-      }
+      };
     },
 
 
