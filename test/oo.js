@@ -118,7 +118,22 @@ test("Instance of test", function () {
   var MyClass = Class.define();
   var SomeClass = MyClass.extend();
   var obj = new SomeClass();
-  
+
   ok(obj.instanceOf(SomeClass), "Constructor is set right");
   ok(obj.instanceOf(MyClass), "Instance of super works");
+});
+
+
+
+test("Namepsace By Defintion", function () {
+  var MyClass = Class.define({
+    namespace : "my.cool.Class"
+  });
+  
+  var MyClass2 = Class.define({
+    namespace : "my.cool.Class2"
+  });
+
+  equal(my.cool.Class, MyClass, "Class1 found in namespace");
+  equal(my.cool.Class2, MyClass2, "Class2 found in namespace");
 });

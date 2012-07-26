@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple (1.69KB minified & gzipped) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.85KB minified & gzipped) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
 
@@ -19,6 +19,7 @@ Simple (1.69KB minified & gzipped) class system for JavaScript. Designed to work
     * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
   * ```__super__``` - reference on super class (Backbone compatible)
   * Singleton
+  * Namespaces
   * Extensible: Add your own definition keys and types
   * Browser & commonJS support
   * Well tested
@@ -130,6 +131,8 @@ Defines a new class.
 ```js
 
 Class.define(superClass, {
+  namespace : String,
+
   singleton : true|false,
 
   mixins : [Object|Class],
@@ -195,10 +198,11 @@ Sometimes it can be usefull not to use the full feature set of class.js. You can
 ```js
 Class.singleton(clazz, setSingleton)
 Class.mixins(clazz, mixins)
-Class.interfaces(clazz, mixins)
-Class.properties(clazz, mixins)
-Class.statics(clazz, mixins)
-Class.members(clazz, mixins)
+Class.interfaces(clazz, interfaces)
+Class.properties(clazz, properties)
+Class.statics(clazz, statics)
+Class.members(clazz, members)
+Class.namespace(namespace, clazz)
 ```   
 ________________________________________________________________________________________________________________________
 
