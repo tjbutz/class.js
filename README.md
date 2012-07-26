@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple Class System for JavaScript. Designed to work with backbone.js and node.js.
+Simple (3.8 kb) Class System for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
 
@@ -16,7 +16,7 @@ Simple Class System for JavaScript. Designed to work with backbone.js and node.j
     * validation
     * init value
     * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
-  * __super__ - reference on super class
+  * "__super__" - reference on super class
   * Singleton
   * Browser & commonJS support
 
