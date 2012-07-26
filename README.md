@@ -51,20 +51,27 @@ require("classjs");
 ```js
 var Company = Class.define(EventEmitter, {
 	properties : {
+		activated : "Boolean",
 		name : {
 			type : "String",
 			init : "No Name",
-			validate : function(value, old) {
-				return value != "foo";
+			validate : function(value, old, prop) {
+				return value != "foo"; // alternative you can return a custom error message as a string
 			},
 			apply : "_applyName",
 			event : "nameChanged"
 		},
-
-		address : {
+		street : {
 			type : "String",
+			format : function(value, old, prop) {
+				return value.toUpperCase()	
+			},
 			get : false, // generate only private getter / setter
 			set : false
+		},
+		city : {
+			type : "String",
+			nullable : true
 		}
 	},
 
@@ -81,13 +88,16 @@ var Company = Class.define(EventEmitter, {
 
 var MyCompany = Company.extend({
 	constructor : function() {
-		this.__super__.apply(this, arguments);
+		Company.apply(this, arguments);
 		this.setName("My Company", false); // Do not fire the event
+		this._setStreet("Some Street", false);
+		this.setCity(null);
 	},
 	
 	
 	members : {
 		addEmploye : function(employe) {
+			// Call overridden method
 			this.__super__.addEmploye.apply(this, arguments);
 		}
 	}
