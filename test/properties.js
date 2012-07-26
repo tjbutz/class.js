@@ -128,6 +128,34 @@ test("Properties init", function () {
   throws(obj.getBar, "Init value with wrong intial value fails");
 });
 
+test("Generic set", function () {
+  var MyClass = Class.define({
+    properties : {
+      foo : {
+        type : "String",
+        init : "Hello"
+      },
+      bar : {
+        type : "Boolean",
+        init : true
+      }
+    }
+  });
+  
+  var obj = new MyClass();
+  
+  obj.set({
+    foo : "Hi",
+    bar : false
+  });
+
+  equal(obj.getFoo(), "Hi", "Generic setter for string");
+  equal(obj.getBar(), false, "Generic setter for boolean");
+  
+  obj.set("bar", true);
+  equal(obj.getBar(), true, "Generic key, value setter works");
+});
+
 test("Properties nullable", function () {
   var MyClass = Class.define({
     properties : {
