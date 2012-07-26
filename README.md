@@ -108,6 +108,7 @@ Class.define(superClass, {
 
   properties : {
     type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class,
+    init : Mixed
     format : "Function" | Function,
     validate : "Function" | Function,
     apply : "Function" | Function,
