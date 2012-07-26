@@ -23,6 +23,7 @@
   }
 
   Class.VERSION = '0.2.1-pre';
+  Class.root = root;
 
   Class.noConflict = function() {
     root.Class = _Class;
@@ -105,6 +106,26 @@
 
     error : function(error) {
       throw error;
+    },
+
+
+    namespace : function(clazz, namespace) {
+      if (_.isString(clazz)) {
+        var tempClass = namespace;
+        namespace = clazz;
+        clazz = tempClass;
+      };
+      namespace = namespace.split(".");
+      var root = this.root;
+      if (namespace.length > 0) {
+        var className = namespace.pop();
+        for (var i=0, l = namespace.length; i < l; i++) {
+          var part = namespace[i];
+          root = root[part] = root[part] || {};
+        }
+        root[className] = clazz;
+      }
+      return clazz;
     },
 
 
@@ -347,6 +368,7 @@
 
 
   Class.definition = {
+    "namespace" : Class.namespace,
     "singleton" : Class.singleton,
     "mixins" : Class.mixins,
     "interfaces" : Class.interfaces,
