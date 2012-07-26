@@ -263,4 +263,45 @@ For example you can override the default error handler for class.js:
     throw error;
   }
 ```
+
+or use it for validation: 
+
+
+```js
+
+  var MyClass = Class.define({
+    foo : "Boolean"
+    bar : "Number"
+  });
+
+  var data = {
+    foo : true,
+    bar : "Some String"
+  };
+  
+  var obj = new MyClass();
+  var errors = [];
+
+  var validate = function(property, value) {
+    errors = [];
+    for (var property in data) {
+      try {
+        obj.set(property, data[value]);  
+      } catch (exc) {
+        errors.push(exc);
+      }
+    }
+    return errors.length === 0;
+  }
+
+  for (var property in data) {
+    validate(property, data[property])
+  }
+
+  if (validate(data)) {
+    console.log("Validation OK. Submit form");
+  } else {
+    console.log("Errors", errors);
+  }
+```
 ________________________________________________________________________________________________________________________
