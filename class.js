@@ -4,7 +4,7 @@
  *
  * (c) 2012 Tino Butz
  * class.js may be freely distributed under the MIT license.
- * 
+ *
  * License: https://github.com/tjbutz/class.js/LICENSE
  */
 (function() {
@@ -12,9 +12,9 @@
 
   var _ = root._;
   if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
-  
+
   var _Class = root.Class;
-  
+
   var Class;
   if (typeof exports !== 'undefined') {
     Class = exports;
@@ -28,7 +28,7 @@
     root.Class = _Class;
     return this;
   };
-  
+
 
   var tempConstructor = function() {};
 
@@ -45,7 +45,6 @@
       "Regex" : _.isRegExp
     },
 
-
     _extend : function(definition) {
       return Class.define(this, definition);
     },
@@ -61,7 +60,7 @@
       var constructor = definition && definition.hasOwnProperty("constructor") ? definition.constructor : null;
       var clazz = function() {
         if (!(this instanceof clazz)) {
-          throw new Error("Use new keyword to create a new instance");
+          throw new Error("Use new keyword to create a new instance or call/apply class with right scope");
         }
         if (constructor) {
           constructor.apply(this, arguments);
@@ -77,219 +76,273 @@
         // inherit
         clazz.prototype = new tempConstructor();
         // fix the constructor
-        clazz.constructor = clazz;      
+        clazz.constructor = clazz;
         // remember the super class for calls in overridden methods
         clazz.prototype.__super__ = superClass.prototype;
       }
 
+      // add error handler
+      clazz.prototype.$$error = Class.error;
+
       // add definition
-      if (definition) {
-
-        // singleton
-        if (definition.singleton) {
-          clazz.$$instance = null;
-          clazz.getInstance = function() {
-            return this.$$instance || (this.$$instance = new this());
-          };
+      for (var key in definition) {
+        if (typeof this.definition[key] !== "undefined") {
+          this.definition[key].call(this, clazz, definition[key]);
+        } else {
+          throw new Error("Unknown key in definition: " + key + ". Allowed keys are: " + _.keys(this.definition).join(", "));
         }
-
-        // add mixins
-        var mixins = definition.mixins;
-        if (mixins) {
-          for (var i=0, l=mixins.length; i < l; i++) {
-            var mixin = _.isFunction(mixins[i]) ? mixins[i].prototype : mixins[i];
-            _.extend(clazz.prototype, mixin);
-          }
-        }
-
-        // add properties
-        var properties = definition.properties;
-        if (properties) {
-          for (var property in properties) {
-            Class._createProperty(clazz, property, properties[property]);
-          }
-        }
-
-        // add batch property set method
-        clazz.prototype.set = function(properties) {
-          for (var property in properties) {
-            var prop = firstUp(property);
-            var setter = "set" + prop;
-            if (this[setter]) {
-              this[setter](properties[property]);
-            } else {
-              throw new Error('No public set method for property "' + property + '" found.');
-            }
-
-          }
-          return this;
-        }
-
-        // add members & statics
-        _.extend(clazz.prototype, definition.members);
-        _.extend(clazz, definition.statics);
-
-        // interfaces
-        var interfaces = definition.interfaces;
-        if (interfaces) {
-          for (var i=0, l=interfaces.length; i < l; i++) {
-            var inter = _.isFunction(interfaces[i]) ? interfaces[i].prototype : interfaces[i];
-            for (var member in inter) {
-              if (!clazz.prototype[member]) {
-                throw new Error('The Class does not implement the interface member "' + member + '"');   
-              }
-            }
-          }
-        }
-
-        // add error handler
-        var error = Class.error;
-        if (definition.error) {
-           error = _.isString(definition.error) ? clazz.prototype[definition.error] : definition.error;
-        }
-        clazz.prototype.$$error = error;
       }
-      
 
       // provide extend method for inheritance
-      clazz.extend = Class._extend;
-      
+      clazz.extend = this._extend;
+
       // provide instance of check
-      clazz.prototype.instanceOf = Class._instanceOf;
+      clazz.prototype.instanceOf = this._instanceOf;
 
       return clazz;
     },
 
-
-    _instanceOf : function(obj) {
-      return this instanceof obj;
-    },
 
     error : function(error) {
       throw error;
     },
 
 
+    singleton : function(clazz, isSingleton) {
+      if (isSingleton) {
+        clazz.$$instance = null;
+        clazz.getInstance = function() {
+          return this.$$instance || (this.$$instance = new this());
+        };
+      }
+    },
+
+
+    mixins : function(clazz, mixins) {
+      this._forProto(clazz, mixins, function(mixin) {
+        _.extend(clazz.prototype, mixin);
+      });
+    },
+
+
+    interfaces : function(clazz, interfaces) {
+      this._forProto(clazz, interfaces, function(inter) {
+        for (var member in inter) {
+          if (!clazz.prototype[member]) {
+            throw new Error('The Class does not implement the interface member "' + member + '"');
+          }
+        }
+      });
+    },
+
+
+    members : function(clazz, members) {
+      _.extend(clazz.prototype, members);
+    },
+
+
+    statics : function(clazz, statics) {
+      _.extend(clazz, statics);
+    },
+
+
+    properties : function(clazz, properties) {
+      for (var property in properties) {
+        this._createProperty(clazz, property, properties[property]);
+      }
+
+      // add batch property set method
+      clazz.prototype.set = function(properties) {
+        for (var property in properties) {
+          var prop = firstUp(property);
+          var setter = "set" + prop;
+          if (this[setter]) {
+            this[setter](properties[property]);
+          } else {
+            throw new Error('No public set method for property "' + property + '" found.');
+          }
+
+        }
+        return this;
+      }
+    },
+
+
     _createProperty : function(clazz, property, definition) {
-       var prop = firstUp(property);
-       
+      // When the definition is not an object it is a type definition
+      if (!_.isObject(definition)) {
+        definition = {
+          type : definition
+        }
+      }
+
+      var setter = this._getPropertyMethodName(property, definition, "set");
+      var getter = this._getPropertyMethodName(property, definition, "get");
+
+      // add setter
+      clazz.prototype[setter] = this._createSetter(property, definition, getter, setter);
+
+      // add getter
+      clazz.prototype[getter] = this._createGetter(property, definition, getter, setter)
+
+      // add "is" function for boolean
+      if (definition.type === "Boolean") {
+        var is = this._getPropertyMethodName(property, definition, "is");
+        clazz.prototype[is] = this._createIs(property, definition, getter, setter);
+      }
+    },
+
+
+    _getPropertyMethodName : function(property, definition, method) {
+      var prop = firstUp(property);
+
        // define getter function name
-       var getter = "get" + prop;
-       if (definition.get === false) {
-         getter = "_" + getter;
+       name = method + prop;
+       if (definition[method === "is" ? "get" : method] === false) {
+         name = "_" + name;
        }
 
-       // add set method
-       var setter = "set" + prop;
-       if (definition.set === false) {
-         setter = "_" + setter;
-       }
-
-       clazz.prototype[setter] = function(value, fireEvent) {
-         fireEvent = fireEvent === true ? true : false;
-
-         var old = this[getter]();
-
-         // add format function
-         if (definition.format) {
-           var func = _.isString(definition.format) ? this[definition.format] : definition.format;
-           if (func) {
-             value = func.call(this, value, old, property);
-           } else {
-             throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
-           }
-         }
-
-         // add type check
-         var type = definition.type;
-         var skip = _.isNull(value) && definition.nullable === true
-         if (!skip && type) {
-           var assert = _.isFunction(type) ? this.instanceOf : Class.types[type];
-           if (assert) {
-             if (!assert.call(this, value)) {
-               var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);               
-               this.$$error.call(this, new ValidationError(msg, property, value));
-               return;
-             }          
-           } else {
-             throw new Error('Unknown type "' + type +'" for property "' + property + '".');
-           }
-         }
-
-         // add validate function
-         if (definition.validate) {
-           var func = _.isString(definition.validate) ? this[definition.validate] : definition.validate;
-           if (func) {
-             if (!func.call(this, value, old, property)) {
-               var msg = 'Validation for property "' + property + '" with value "' + value + '" failed';
-               this.$$error.call(this, new TypeError(msg, property, value, type));
-               return;
-             }
-           } else {
-             throw new Error('Validation method "' + definition.validate + '" for property "' + property + '" not available.');
-           }
-         }
-
-         // set value
-         this.$$properties[property] = value;
-
-         // add apply method
-         if (definition.apply) {
-           var func = _.isString(definition.apply) ? this[definition.apply] : definition.apply;
-           if (func) {
-             func.call(this, value, old, property);          
-           } else {
-             throw new Error('Apply method "' + definition.apply + '" for property "' + property + '" not available.');
-           }
-         }
-
-         // add event
-         if (definition.event && fireEvent) {
-           var emit = this.trigger || this.emit;
-           if (emit) {
-             emit.call(this, definition.event, {
-               target : this,
-               value : value,
-               old : old,
-               property : property
-             });
-           } else {
-             throw new Error("Object does not support events");
-           }
-         }
-
-         return value;
-       };
-
-       // add getter
-       clazz.prototype[getter] = function() {
-         this.$$properties = this.$$properties || {};
-
-         if (typeof definition.init !== "undefined") {
-           this.$$properties[property] = definition.init;
-           delete definition.init;
-         }
-         return this.$$properties[property];
-       };
-
-
-       // add is function for boolean
-       if (definition.type === "Boolean") {
-         var is = "is"+prop;
-         if (definition.get === false) {
-           is = "_" + is;
-         }
-         clazz.prototype[is] = function() {
-           return this[getter]();
-         };
-       }
+       return name;
      },
 
-     ValidationError : ValidationError,
-     TypeError : TypeError
+
+    _createGetter : function(property, definition, getter, setter) {
+      return function() {
+        this.$$properties = this.$$properties || {};
+
+        if (typeof definition.init !== "undefined") {
+          var init = definition.init;
+          delete definition.init;
+          this[setter](init);
+        }
+
+        return this.$$properties[property];
+      };
+    },
+
+
+    _createSetter : function(property, definition, getter, setter) {
+      return function(value, fireEvent) {
+        fireEvent = fireEvent === false ? false : true;
+
+        var old = this[getter]();
+
+        // add format function
+        if (definition.format) {
+          var func = _.isString(definition.format) ? this[definition.format] : definition.format;
+          if (func) {
+            value = func.call(this, value, old, property);
+          } else {
+            throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
+          }
+        }
+
+        // add type check
+        var type = definition.type;
+        var skip = _.isNull(value) && definition.nullable === true
+        if (!skip && type) {
+          var assert = _.isFunction(type) ? this.instanceOf : Class.types[type];
+          if (assert) {
+            if (!assert.call(this, value)) {
+              var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);
+              msg += '. Allowed keys are: ' + _.keys(Class.types).join(", ");
+              var error = new Class.TypeError(msg, property, value, type);
+              this.$$error.call(this, error);
+              return;
+            }
+          } else {
+            throw new Error('Unknown type "' + type +'" for property "' + property + '".');
+          }
+        }
+
+        // add validate function
+        var validate = definition.validate;
+        if (validate) {
+          // Autobox validate
+          if (!_.isArray(validate)) {
+            validate = [validate];
+          }
+
+          _.each(validate, function(validator) {
+            validator = _.isString(validator) ? this[validator] : validator;
+            if (validator) {
+              var check = validator.call(this, value, old, property);
+              // Feature: when a string is returned, validation is failed and we use it as the error message
+              var isString = _.isString(check);
+              if (!check || isString) {
+                var msg = isString ? check : 'Validation for property "' + property + '" with value "' + value + '" failed';
+                this.$$error.call(this, new Class.ValidationError(msg, property, value));
+                return;
+              }
+            } else {
+              throw new Error('Validation method "' + definition.validate + '" for property "' + property + '" not available.');
+            }
+          }, this);
+        }
+
+        // set value
+        this.$$properties[property] = value;
+
+        // add apply method
+        if (definition.hasOwnProperty("apply")) {
+          var func = _.isString(definition.apply) ? this[definition.apply] : definition.apply;
+          if (func) {
+            func.call(this, value, old, property);
+          } else {
+            throw new Error('Apply method "' + definition.apply + '" for property "' + property + '" not available.');
+          }
+        }
+
+        // add event
+        if (definition.event && fireEvent) {
+          var emit = this.trigger || this.emit;
+          if (emit) {
+            emit.call(this, definition.event, {
+              target : this,
+              value : value,
+              old : old,
+              property : property
+            });
+          } else {
+            throw new Error("Object does not support events");
+          }
+        }
+        return value;
+      };
+    },
+
+
+    _forProto : function(clazz, definition, handler, scope) {
+      _.each(definition, function(obj) {
+        var obj = _.isFunction(obj) ? obj.prototype : obj;
+        handler.call(scope, obj);
+      });
+    },
+
+
+    _createIs : function(property, definition, getter, setter) {
+      return function() {
+        return this[getter]();
+      };
+    },
+
+
+    _instanceOf : function(obj) {
+      return this instanceof obj;
+    }
   });
 
-  var ValidationError = Class.define(Error, {
+
+  Class.definition = {
+    "singleton" : Class.singleton,
+    "mixins" : Class.mixins,
+    "interfaces" : Class.interfaces,
+    "statics" : Class.statics,
+    "properties" : Class.properties,
+    "members" : Class.members
+  };
+
+  var ValidationError = Class.ValidationError = Class.define(Error, {
     constructor : function(message, property, value) {
       this.name = "ValidationError";
       this.message = message || "Validation Error";
@@ -298,9 +351,10 @@
     }
   });
 
-  var TypeError = ValidationError.extend({
+
+  var TypeError = Class.TypeError = ValidationError.extend({
     constructor : function(message, property, value, type) {
-      this.__super__.apply(arguments);
+      ValidationError.apply(this, arguments);
 
       this.name = "TypeError";
       this.message = message || "Type Error";
@@ -308,7 +362,7 @@
     }
   });
 
-  
+
   var firstUp = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1);
   };
