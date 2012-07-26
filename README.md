@@ -118,7 +118,9 @@ company.setName("My new Company");
 
 ## API
 
-'Class.define(superClass, definition)'
+```js
+Class.define(superClass, definition)
+```
 
   * superClass: Class (optional)
   * definition: Object (optional)
@@ -168,7 +170,11 @@ Class.define(superClass, {
 });
 ```
 
-'SomeClass.extend(definition)'
+________________________________________________________________________________________________________________________
+
+```js
+SomeClass.extend(definition)
+```
 
   * definition: Object (optional) (see Class.extend for more details)
 
@@ -183,3 +189,78 @@ The ```extend``` method is added automatically to every created Class. Extends f
 ```
 
 ## Advanced
+
+Sometimes it can be usefull not to use the full feature set of class.js. You can use the methods that are used for the class definitions standalone as well:
+
+```js
+Class.singleton(clazz, setSingleton)
+Class.mixins(clazz, mixins)
+Class.interfaces(clazz, mixins)
+Class.properties(clazz, mixins)
+Class.statics(clazz, mixins)
+Class.members(clazz, mixins)
+```   
+________________________________________________________________________________________________________________________
+
+Extending types
+
+```js
+Class.types
+```
+
+For example:
+
+```js
+Class.types["MyType"] = function(value) {
+  return value instanceof MyType;
+}
+```
+________________________________________________________________________________________________________________________
+
+Extending definition
+
+```js
+Class.definition
+```
+
+For example:
+
+```js
+Class.definition["mykey"] = function(clazz, definition) {
+  for (var key in definition) {
+    clazz.prototype[key] = function() {
+      alert("My New Extension");
+    }
+  }
+}
+```
+________________________________________________________________________________________________________________________
+
+Error Types
+
+```js
+Class.ValidationError
+Class.TypeError // extends from validation error
+```
+
+For example you can override the default error handler for class.js:
+
+```js
+  Class.error = function(error) {
+    if (error instanceof Class.TypeError) {
+      console.log(error.message);
+      console.log(error.type);
+      console.log(error.value);
+      console.log(error.property);
+    }
+
+    if (error instanceof Class.ValidationError) {
+      console.log(error.message);
+      console.log(error.value);
+      console.log(error.property);
+    }
+
+    throw error;
+  }
+```
+________________________________________________________________________________________________________________________
