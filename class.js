@@ -1,5 +1,5 @@
 /**
- * class.js v0.2.0
+ * class.js v0.2.1-pre
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -22,7 +22,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.2.0';
+  Class.VERSION = '0.2.1-pre';
 
   Class.noConflict = function() {
     root.Class = _Class;
