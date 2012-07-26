@@ -11,14 +11,15 @@ Simple (1.69KB minified & gzipped) Class System for JavaScript. Designed to work
   * Properties
     * getter / setter
     * visibility
-  	* type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex)
-  	* format value
+    * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, more can be added)
+    * format value
     * validation
     * init value,
 	* nullable
     * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
   * ```__super__``` - reference on super class (Backbone compatible)
   * Singleton
+  * Extensible: Add your own definition keys and types
   * Browser & commonJS support
   * Well tested
 
