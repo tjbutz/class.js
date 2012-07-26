@@ -24,7 +24,7 @@ Simple (3.8 kb) Class System for JavaScript. Designed to work with backbone.js a
 
   * http://underscorejs.org
 
-## Usage
+## Installation
 
 Browser:
 
