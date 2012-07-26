@@ -15,7 +15,7 @@ Simple (1.69KB minified & gzipped) class system for JavaScript. Designed to work
     * format value
     * validation
     * init value,
-	* nullable
+    * nullable
     * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
   * ```__super__``` - reference on super class (Backbone compatible)
   * Singleton
@@ -50,6 +50,8 @@ require("classjs");
 
 
 ```js
+
+// Define a new class. Extend from EventEmitter.
 var Company = Class.define(EventEmitter, {
 	properties : {
 		activated : "Boolean",
@@ -87,6 +89,7 @@ var Company = Class.define(EventEmitter, {
 	}
 });
 
+// Extend from "Company"
 var MyCompany = Company.extend({
 	constructor : function() {
 		Company.apply(this, arguments);
@@ -115,13 +118,23 @@ company.setName("My new Company");
 
 ## API
 
+"Class.define(superClass, definition)" 
+
+  * superClass: Class (optional)
+  * definition: Object (optional)
+
+Defines a new class.
+
 ```js
+
 Class.define(superClass, {
   singleton : true|false,
 
   mixins : [Object|Class],
 
   interfaces : [Object|Class],
+  
+  constructor : Function, // Optional. Super constructor is called implicit when not available
 
   properties : {
     prop1 : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Simple property definition
@@ -153,4 +166,18 @@ Class.define(superClass, {
     ...
   }
 });
+```
+
+"SomeClass.extend(definition)" 
+
+  * definition: Object (optional) (see Class.extend for more details)
+
+The ```extend``` method is added automatically to every created Class. Extends from the given class.
+
+```js
+
+  var MyClass = Class.define();
+  var SomeClass = MyClass.extend();
+  var obj = new SomeClass();
+
 ```
