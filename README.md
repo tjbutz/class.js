@@ -47,53 +47,57 @@ require("classjs");
 
 
 ```js
-var Monkey = Class.define(EventEmitter, {
+var Company = Class.define(EventEmitter, {
 	properties : {
-		"legs" : {
-			type : "Number",
-			init : 4,
+		name : {
+			type : "String",
+			init : "No Name",
 			validate : function(value, old) {
-				return value <= 4;
+				return value != "foo";
 			},
-			apply : "_applyLegs",
-			event : "legsChanged"
+			apply : "_applyName",
+			event : "nameChanged"
 		},
 
-		head : {
-			type : "Object",
+		address : {
+			type : "String",
 			get : false, // generate only private getter / setter
 			set : false
 		}
 	},
 
 	members : {
-		_applyLegs : function(value, old) {
-			console.log(value, old);
+		_applyName : function(value, old, prop) {
+			console.log(value, old, prop);
 		},
 		
-		jump : function() {
-			console.log("jump");
+		addEmploye : function(employe) {
+			console.log("employe");
 		}
 	}
 });
 
-var TwoLeggedMonkey = Monkey.extend({
+var MyCompany = Company.extend({
 	constructor : function() {
 		this.__super__.apply(this, arguments);
-		this.setLegs(3, false); // Do not fire the event
+		this.setName("My Company", false); // Do not fire the event
 	},
 	
-	jump : function() {
-		this.__super__.jump.apply(arguments);
+	
+	members : {
+		addEmploye : function(employe) {
+			this.__super__.addEmploye.apply(arguments);
+		}
 	}
+	
 });
 
-var monkey = new TwoLeggedMonkey();
-monkey.on("legsChanged", function(data) {
-	console.log("Legs changed to %i", data.value);
+var company = new MyCompany();
+company.on("nameChanged", function(data) {
+	console.log("Name changed to %s", data.value);
 });
-monkey.jump();
-monkey.setLegs(2);
+company.addEmploye({name:"Lena"});
+company.setName("My new Company");
 ```
 
 ## API
