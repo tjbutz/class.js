@@ -143,8 +143,13 @@
         }
 
         // add error handler
-        clazz.prototype.$$error = definition.error || Class.error;
+        var error = Class.error;
+        if (definition.error) {
+           error = _.isString(definition.error) ? clazz.prototype[definition.error] : definition.error;
+        }
+        clazz.prototype.$$error = error;
       }
+      
 
       // provide extend method for inheritance
       clazz.extend = Class._extend;

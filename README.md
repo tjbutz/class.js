@@ -96,3 +96,34 @@ monkey.jump();
 monkey.setLegs(2);
 ```
 
+## API
+
+```js
+Class.define(superClass, {
+  singleton : true|false,
+
+  mixins : [Object|Class],
+
+  interfaces : [Object|Class],
+
+  properties : {
+    type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class,
+    format : "Function" | Function,
+    validate : "Function" | Function,
+    apply : "Function" | Function,
+    set : true|false,
+    get : true|false,
+    event : String
+  },
+
+  statics : {
+    ...
+  },
+  
+  members : {
+    ...
+  },
+  
+  error : "Function" | Function
+});
+```
