@@ -271,11 +271,12 @@ test("Property validation", function () {
   ok(validate1, "validation function returns true");
 
   var validate2 = false;
+  validate1 = false;
   try {
    obj.setMore("error");
   } catch (exc) {
     var ValidationError = Class.ValidationError;
-    validate2 = (exc.message == "custom msg" && exc instanceof ValidationError);
+    validate2 = (exc.message == "custom msg" && exc instanceof ValidationError && validate1);
   }
   ok(validate2, "more than one validation and error with custom message");
 });
