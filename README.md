@@ -123,22 +123,32 @@ Class.define(superClass, {
   interfaces : [Object|Class],
 
   properties : {
-    type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class,
-    init : Mixed
-    format : "Function" | Function,
-    validate : "Function" | Function,
-    apply : "Function" | Function,
-    set : true|false,
-    get : true|false,
-	nullable : true|false,
-    event : String
+    prop1 : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Simple property definition
+    prop2 : {
+                type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Complex property definition
+        	      init : Mixed
+        	      format : "Function" | Function,
+        	      validate : "Function" | Function | ["Function"|Function],
+              	apply : "Function" | Function,
+              	set : true|false,
+                get : true|false,
+              	nullable : true|false,
+                event : String
+              }	
+    ...	
   },
+  
+
 
   statics : {
+    static1 : Function,
+    static2 : Function,
     ...
   },
   
   members : {
+    member1 : Function
+    member2 : Function
     ...
   }
 });
