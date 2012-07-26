@@ -165,8 +165,8 @@
       return this instanceof obj;
     },
 
-    error : function(property, value, type, msg, errorType) {
-      throw new Error(msg);
+    error : function(error) {
+      throw error;
     },
 
 
