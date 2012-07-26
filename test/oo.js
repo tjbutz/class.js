@@ -113,3 +113,12 @@ test("Explicit constructor call: extend", function () {
   var obj = new MyClass("Monkey");
   equal(obj.name, "Monkey", "Constructor of super not called");
 });
+
+test("Instance of test", function () {
+  var MyClass = Class.define();
+  var SomeClass = MyClass.extend();
+  var obj = new SomeClass();
+  
+  ok(obj.instanceOf(SomeClass), "Constructor is set right");
+  ok(obj.instanceOf(MyClass), "Instance of super works");
+});
