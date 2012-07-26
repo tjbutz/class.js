@@ -118,7 +118,7 @@ company.setName("My new Company");
 
 ## API
 
-"Class.define(superClass, definition)" 
+'Class.define(superClass, definition)'
 
   * superClass: Class (optional)
   * definition: Object (optional)
@@ -168,7 +168,7 @@ Class.define(superClass, {
 });
 ```
 
-"SomeClass.extend(definition)" 
+'SomeClass.extend(definition)'
 
   * definition: Object (optional) (see Class.extend for more details)
 
@@ -181,3 +181,5 @@ The ```extend``` method is added automatically to every created Class. Extends f
   var obj = new SomeClass();
 
 ```
+
+## Advanced
