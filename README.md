@@ -4,22 +4,23 @@ class.js
 Simple (1.88KB minified & gzipped) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
-
-  * Inheritance
-  * Mixins
-  * Interfaces
-  * Properties
-    * getter / setter
-    * visibility
-    * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, more can be added)
-    * format value
-    * validation
-    * init value,
-    * nullable
-    * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
-  * ```__super__``` - reference on super class (Backbone compatible)
-  * Singleton
-  * Namespaces
+  * Core:
+    * Inheritance 
+    * ```__super__``` - reference on super class (Backbone compatible)
+  * Plugins:
+    * Mixins
+    * Interfaces
+    * Singleton
+    * Namespaces
+    * Properties
+      * getter / setter
+      * visibility
+      * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, more can be added)
+      * format value
+      * validation
+      * init value,
+      * nullable
+      * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
   * Extensible: Add your own definition keys and types
   * Browser & commonJS support
   * Well tested
