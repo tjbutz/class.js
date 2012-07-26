@@ -15,7 +15,7 @@ Simple (1.69KB minified & gzipped) class system for JavaScript. Designed to work
     * format value
     * validation
     * init value,
-	* nullable
+    * nullable
     * events (optional, event emitter needed: e.g. Backbone.Events, node.js events.EventEmitter)
   * ```__super__``` - reference on super class (Backbone compatible)
   * Singleton
@@ -50,6 +50,8 @@ require("classjs");
 
 
 ```js
+
+// Define a new class. Extend from EventEmitter.
 var Company = Class.define(EventEmitter, {
 	properties : {
 		activated : "Boolean",
@@ -87,6 +89,7 @@ var Company = Class.define(EventEmitter, {
 	}
 });
 
+// Extend from "Company"
 var MyCompany = Company.extend({
 	constructor : function() {
 		Company.apply(this, arguments);
@@ -116,12 +119,24 @@ company.setName("My new Company");
 ## API
 
 ```js
+Class.define(superClass, definition)
+```
+
+  * superClass: Class (optional)
+  * definition: Object (optional)
+
+Defines a new class.
+
+```js
+
 Class.define(superClass, {
   singleton : true|false,
 
   mixins : [Object|Class],
 
   interfaces : [Object|Class],
+  
+  constructor : Function, // Optional. Super constructor is called implicit when not available
 
   properties : {
     prop1 : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Simple property definition
@@ -154,3 +169,139 @@ Class.define(superClass, {
   }
 });
 ```
+
+________________________________________________________________________________________________________________________
+
+```js
+SomeClass.extend(definition)
+```
+
+  * definition: Object (optional) (see Class.extend for more details)
+
+The ```extend``` method is added automatically to every created Class. Extends from the given class.
+
+```js
+
+  var MyClass = Class.define();
+  var SomeClass = MyClass.extend();
+  var obj = new SomeClass();
+
+```
+
+## Advanced
+
+Sometimes it can be usefull not to use the full feature set of class.js. You can use the methods that are used for the class definitions standalone as well:
+
+```js
+Class.singleton(clazz, setSingleton)
+Class.mixins(clazz, mixins)
+Class.interfaces(clazz, mixins)
+Class.properties(clazz, mixins)
+Class.statics(clazz, mixins)
+Class.members(clazz, mixins)
+```   
+________________________________________________________________________________________________________________________
+
+Extending types
+
+```js
+Class.types
+```
+
+For example:
+
+```js
+Class.types["MyType"] = function(value) {
+  return value instanceof MyType;
+}
+```
+________________________________________________________________________________________________________________________
+
+Extending definition
+
+```js
+Class.definition
+```
+
+For example:
+
+```js
+Class.definition["mykey"] = function(clazz, definition) {
+  for (var key in definition) {
+    clazz.prototype[key] = function() {
+      alert("My New Extension");
+    }
+  }
+}
+```
+________________________________________________________________________________________________________________________
+
+Error Types
+
+```js
+Class.ValidationError
+Class.TypeError // extends from validation error
+```
+
+For example you can override the default error handler for class.js:
+
+```js
+  Class.error = function(error) {
+    if (error instanceof Class.TypeError) {
+      console.log(error.message);
+      console.log(error.type);
+      console.log(error.value);
+      console.log(error.property);
+    }
+
+    if (error instanceof Class.ValidationError) {
+      console.log(error.message);
+      console.log(error.value);
+      console.log(error.property);
+    }
+
+    throw error;
+  }
+```
+
+or use it for validation: 
+
+
+```js
+
+  var MyClass = Class.define({
+    foo : "Boolean"
+    bar : "Number"
+  });
+
+  var data = {
+    foo : true,
+    bar : "Some String"
+  };
+  
+  var obj = new MyClass();
+  var errors = [];
+
+  var validate = function(property, value) {
+    errors = [];
+    for (var property in data) {
+      try {
+        obj.set(property, data[value]);  
+      } catch (exc) {
+        errors.push(exc);
+      }
+    }
+    return errors.length === 0;
+  }
+
+  for (var property in data) {
+    validate(property, data[property])
+  }
+
+  if (validate(data)) {
+    console.log("Validation OK. Submit form");
+  } else {
+    console.log("Errors", errors);
+  }
+```
+________________________________________________________________________________________________________________________
