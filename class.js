@@ -1,5 +1,5 @@
 /**
- * class.js v0.1.1
+ * class.js v0.2.0
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -22,7 +22,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.1.1';
+  Class.VERSION = '0.2.0';
 
   Class.noConflict = function() {
     root.Class = _Class;
@@ -129,7 +129,6 @@
         _.extend(clazz.prototype, definition.members);
         _.extend(clazz, definition.statics);
 
-
         // interfaces
         var interfaces = definition.interfaces;
         if (interfaces) {
@@ -142,6 +141,9 @@
             }
           }
         }
+
+        // add error handler
+        clazz.prototype.$$error = definition.error || Class.error;
       }
 
       // provide extend method for inheritance
@@ -156,6 +158,10 @@
 
     _instanceOf : function(obj) {
       return this instanceof obj;
+    },
+
+    error : function(property, value, type, msg, errorType) {
+      throw new Error(msg);
     },
 
 
@@ -183,7 +189,7 @@
          if (definition.format) {
            var func = _.isString(definition.format) ? this[definition.format] : definition.format;
            if (func) {
-             value = func.call(this, value, old);
+             value = func.call(this, value, old, property);
            } else {
              throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
            }
@@ -196,7 +202,9 @@
            var assert = _.isFunction(type) ? this.instanceOf : Class.types[type];
            if (assert) {
              if (!assert.call(this, value)) {
-               throw new Error('Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value));
+               var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);               
+               this.$$error.call(this, new ValidationError(msg, property, value));
+               return;
              }          
            } else {
              throw new Error('Unknown type "' + type +'" for property "' + property + '".');
@@ -207,8 +215,10 @@
          if (definition.validate) {
            var func = _.isString(definition.validate) ? this[definition.validate] : definition.validate;
            if (func) {
-             if (!func.call(this, value, old)) {
-               throw new Error('Validation for property "' + property + '" with value "' + value + '" failed');
+             if (!func.call(this, value, old, property)) {
+               var msg = 'Validation for property "' + property + '" with value "' + value + '" failed';
+               this.$$error.call(this, new TypeError(msg, property, value, type));
+               return;
              }
            } else {
              throw new Error('Validation method "' + definition.validate + '" for property "' + property + '" not available.');
@@ -222,7 +232,7 @@
          if (definition.apply) {
            var func = _.isString(definition.apply) ? this[definition.apply] : definition.apply;
            if (func) {
-             func.call(this, value, old);          
+             func.call(this, value, old, property);          
            } else {
              throw new Error('Apply method "' + definition.apply + '" for property "' + property + '" not available.');
            }
@@ -235,7 +245,8 @@
              emit.call(this, definition.event, {
                target : this,
                value : value,
-               old : old
+               old : old,
+               property : property
              });
            } else {
              throw new Error("Object does not support events");
@@ -267,9 +278,31 @@
            return this[getter]();
          };
        }
-     }
+     },
+
+     ValidationError : ValidationError,
+     TypeError : TypeError
   });
-  
+
+  var ValidationError = Class.define(Error, {
+    constructor : function(message, property, value) {
+      this.name = "ValidationError";
+      this.message = message || "Validation Error";
+      this.property = property;
+      this.value = value;
+    }
+  });
+
+  var TypeError = ValidationError.extend({
+    constructor : function(message, property, value, type) {
+      this.__super__.apply(arguments);
+
+      this.name = "TypeError";
+      this.message = message || "Type Error";
+      this.type = type;
+    }
+  });
+
   
   var firstUp = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1);
