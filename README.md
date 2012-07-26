@@ -92,6 +92,8 @@ var Company = Class.define(EventEmitter, {
 
 // Extend from "Company"
 var MyCompany = Company.extend({
+	namespace : "my.cool.Company",
+
 	constructor : function() {
 		Company.apply(this, arguments);
 		this.setName("My Company", false); // Do not fire the event
