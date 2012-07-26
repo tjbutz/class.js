@@ -127,8 +127,6 @@ Class.define(superClass, {
   
   members : {
     ...
-  },
-  
-  error : "Function" | Function
+  }
 });
 ```
