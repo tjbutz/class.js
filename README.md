@@ -86,7 +86,7 @@ var MyCompany = Company.extend({
 	
 	members : {
 		addEmploye : function(employe) {
-			this.__super__.addEmploye.apply(arguments);
+			this.__super__.addEmploye.apply(this, arguments);
 		}
 	}
 	
