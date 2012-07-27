@@ -385,11 +385,11 @@ or use it for validation:
 ```
 
 ## Version History
-  * 0.5 (2012/7/27, not published to npm)
-   * Added ECMA5 getter/setter
-   * API stabilization / changes
-     * Removed "notfire" event parameter from property setter
-   * API & Feature freeze for 1.0
+ * 0.5 (2012/7/27, not published to npm)
+  * Added ECMA5 getter/setter
+  * API stabilization / changes
+  * Removed "notfire" event parameter from property setter
+  * API & Feature freeze for 1.0
  * 0.4 (2012/7/27, not published to npm)
   * Improved plugin system
   * Added strict mode
