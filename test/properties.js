@@ -37,7 +37,7 @@ test("Properties basic", function () {
   equal(obj.getMyType(), myType, "Defining custom type");
 
   obj.setNoType(myType);
-  equal(obj.getMyType(), myType, "Defining no type");
+  equal(obj.getNoType(), myType, "Defining no type");
 });
 
 
@@ -260,11 +260,6 @@ test("Properties events", function () {
   var obj = new MyClass();
   obj.setFoo(true);
   ok(eventFired, "Event is fired");
-
-  eventFired = false;
-
-  obj.setFoo(true, false);
-  equal(eventFired,  false, "Event is not fired when foo is set");
 });
 
 

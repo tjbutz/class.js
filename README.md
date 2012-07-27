@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple (1.89KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.93KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
   * Core:
@@ -13,7 +13,7 @@ Simple (1.89KB minified & gzipped & all features) class system for JavaScript. D
     * Singleton
     * Namespaces
     * Properties
-      * getter / setter
+      * getter / setter (Optional:Support for ECMA5 getter / setter)
       * visibility
       * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, more can be added)
       * format value
@@ -97,7 +97,7 @@ var MyCompany = Company.extend({
 
 	constructor : function() {
 		Company.apply(this, arguments);
-		this.setName("My Company", false); // Do not fire the event
+		this.setName("My Company"); 
 		this._setStreet("Some Street", false);
 		this.setCity(null);
 	},
@@ -264,6 +264,35 @@ Class.onAfterClassDefine = function() {
 ```
 ________________________________________________________________________________________________________________________
 
+ECMA5 Getter / Setter
+
+When ECMA5 Mode is activated instead of setProp / getProp methods, ECMA5 getter and setter are generated. This can be used
+like normal JavaScript properties, but will check for types / validate / format / etc.
+
+```js
+Class.ECMA5;
+```
+
+For example:
+
+```js
+Class.ECMA5 = true;
+
+var MyClass = Class.define({
+  properties : {
+    foo : "Boolean"
+    bar : "Number"      
+  }
+});
+
+
+var obj = new MyClass();
+obj.bar = 1 // no setBar(1) needed
+var bar = obj.bar; // no getBar() needed
+obj.foo = "string" // will throw an exception
+```
+________________________________________________________________________________________________________________________
+
 Before instantiation hooks
 
 ```js
@@ -318,8 +347,10 @@ or use it for validation:
 ```js
 
   var MyClass = Class.define({
-    foo : "Boolean"
-    bar : "Number"
+    properties : {
+      foo : "Boolean"
+      bar : "Number"      
+    }
   });
 
   var data = {
@@ -354,7 +385,12 @@ or use it for validation:
 ```
 
 ## Version History
- * 0.4 (2012/7/27, not yet published to npm)
+  * 0.5 (2012/7/27, not published to npm)
+   * Added ECMA5 getter/setter
+   * API stabilization / changes
+     * Removed "notfire" event parameter from property setter
+   * API & Feature freeze for 1.0
+ * 0.4 (2012/7/27, not published to npm)
   * Improved plugin system
   * Added strict mode
   * API stabilization / changes
@@ -364,7 +400,7 @@ or use it for validation:
   * Before / After instantiation hooks
   * Bugfixes
   * More tests
- * 0.3 (2012/7/27, not yet published to npm)
+ * 0.3 (2012/7/27, not published to npm)
   * Plugin system
   * QUnit tests
   * Namespaces

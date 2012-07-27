@@ -1,5 +1,5 @@
 /*!
- * class.js v0.4
+ * class.js v0.5.0
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -23,7 +23,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.4';
+  Class.VERSION = '0.5.0';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -207,6 +207,8 @@
     throw error;
   };
 
+  Class.ECMA5 = false;
+
   Class.types = {
     "String" : _.isString,
     "Number" : _.isNumber,
@@ -225,25 +227,24 @@
     }
 
     // add batch property set method
-    clazz.prototype.set = createGenericSetter("set");
-    clazz.prototype._set = createGenericSetter("_set");
+    var proto = clazz.prototype;
+    proto.set = createGenericSetter("set");
+    proto._set = createGenericSetter("_set");
   };
 
 
   var createGenericSetter = function(prefix) {
-    return function(properties, value, fireEvent) {
+    return function(properties, value) {
       if (_.isString(properties)) {
         var property = properties;
         properties = {};
         properties[property] = value;
-      } else {
-        fireEvent = fireEvent || value;
       }
       for (var property in properties) {
         var prop = firstUp(property);
         var setter = prefix + prop;
         if (this[setter]) {
-          this[setter](properties[property], fireEvent);
+          this[setter](properties[property]);
         } else {
           throw new Error('No public set method for property "' + property + '" found.');
         }
@@ -261,20 +262,25 @@
         type : definition
       }
     }
+    
+    var proto = clazz.prototype;
 
     var setter = getPropertyMethodName(property, definition, "set");
     var getter = getPropertyMethodName(property, definition, "get");
 
-    // add setter
-    clazz.prototype[setter] = createSetter(property, definition, getter, setter);
-
-    // add getter
-    clazz.prototype[getter] = createGetter(property, definition, getter, setter)
+    // add setter & getter
+    if (!Class.ECMA5) {
+      proto[setter] = createSetter(property, definition, getter, setter);
+      proto[getter] = createGetter(property, definition, getter, setter);
+    } else {
+      proto.__defineSetter__(property, createSetter(property, definition, getter, setter));  
+      proto.__defineGetter__(property, createGetter(property, definition, getter, setter));
+    }
 
     // add "is" function for boolean
     if (definition.type === "Boolean") {
       var is = getPropertyMethodName(property, definition, "is");
-      clazz.prototype[is] = createIs(property, definition, getter, setter);
+      proto[is] = createIs(property, definition, getter, setter);
     }
   };
 
@@ -299,7 +305,11 @@
       if (typeof definition.init !== "undefined") {
         var init = definition.init;
         delete definition.init;
-        this[setter](init);
+        if (!Class.ECMA5) {
+          this[setter](init);          
+        } else {
+          this[property] = init;
+        }
       }
 
       return this.$$properties[property];
@@ -308,10 +318,14 @@
 
 
   var createSetter = function(property, definition, getter, setter) {
-    return function(value, fireEvent) {
-      fireEvent = fireEvent === false ? false : true;
-
-      var old = this[getter]();
+    return function(value) {
+      
+      var old;
+      if (!Class.ECMA5) {
+        old = this[getter]();        
+      } else {
+        old = this[property];
+      }
 
       // add format function
       if (definition.format) {
@@ -322,7 +336,6 @@
           throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
         }
       }
-
       // add type check
       var type = definition.type;
       var skip = _.isNull(value) && definition.nullable === true
@@ -330,10 +343,10 @@
         var assert = _.isFunction(type) ? instaneOf : Class.types[type];
         if (assert) {
           if (!assert.call(this, value)) {
+
             var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);
             msg += '. Allowed keys are: ' + _.keys(Class.types).join(", ");
-            var error = new Class.TypeError(msg, property, value, type);
-            Class.error.call(this, error);
+            Class.error(new Class.TypeError(msg, property, value, type));
             return;
           }
         } else {
@@ -357,7 +370,7 @@
             var isString = _.isString(check);
             if (!check || isString) {
               var msg = isString ? check : 'Validation for property "' + property + '" with value "' + value + '" failed';
-              Class.error.call(this, new Class.ValidationError(msg, property, value));
+              Class.error(new Class.ValidationError(msg, property, value));
               return;
             }
           } else {
@@ -380,7 +393,7 @@
       }
 
       // add event
-      if (definition.event && fireEvent) {
+      if (definition.event) {
         var emit = this.trigger || this.emit;
         if (emit) {
           emit.call(this, definition.event, {
