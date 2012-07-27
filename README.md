@@ -332,3 +332,11 @@ or use it for validation:
   * Docu
  * 0.1
   * Inital release
+
+## ToDo
+
+ * Split up plugins
+ * use grunt
+ * define order of definition plugins
+ * hooks for before/after create object
+ * hooks for before/after define class
