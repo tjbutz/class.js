@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple (1.88KB minified & gzipped) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.84KB minified & gzipped) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
   * Core:
