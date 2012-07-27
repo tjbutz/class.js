@@ -322,5 +322,9 @@ or use it for validation:
  * 0.2
   * Bugfixes
   * API Stabilization
+  * Documentation
+ * 0.1.1
+  * Minor Bugfixes
+  * Docu
  * 0.1
   * Inital release
