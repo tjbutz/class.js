@@ -313,8 +313,8 @@ or use it for validation:
 ```
 
 ## Version History
-
- * 0.3
+ 
+ * 0.3 (2012/7/27, not yet published to npm)
   * Plugin system
   * QUnit tests
   * Namespaces
@@ -323,14 +323,14 @@ or use it for validation:
   * Simple properties (prop:type) now possible
   * Valiator & Formater can now be a member function
   * More documentation
- * 0.2
+ * 0.2 (2012/7/26)
   * Bugfixes
   * API Stabilization
   * Documentation
- * 0.1.1
+ * 0.1.1 (2012/7/26)
   * Minor Bugfixes
   * Docu
- * 0.1
+ * 0.1 (2012/7/26)
   * Inital release
 
 ## ToDo
