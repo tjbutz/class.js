@@ -1,5 +1,5 @@
 /*!
- * class.js v0.5.0
+ * class.js v0.5.1
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -12,7 +12,7 @@
   var root = this;
 
   var _ = root._;
-  if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
+  if (!_ && (typeof require !== 'undefined')) root._ = _ = require('underscore');
 
   var _Class = root.Class;
 
@@ -23,7 +23,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.5.0';
+  Class.VERSION = '0.5.1';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -121,9 +121,10 @@
 // =====================================
 //  NAMESPACE PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
-  var _ = Class.root._;
+  var Class = this.Class || exports;
+  var _ = this._;
 
   Class.definition.push("namespace");
   Class.namespace = function(clazz, namespace) {
@@ -143,15 +144,16 @@
     }
     return clazz;
  };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  SINGLETON PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
-  var _ = Class.root._;
+  var Class = this.Class || exports;
+  var _ = this._;
 
   Class.definition.push("singleton");
   Class.singleton = function(clazz, isSingleton) {
@@ -162,14 +164,15 @@
       };
     }
   };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  MIXINS PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
+  var Class = this.Class || exports;
   var _ = Class.root._;
 
   Class.definition.push("mixins");
@@ -179,29 +182,31 @@
       _.extend(clazz.prototype, obj);
     });
   };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  STATICS PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
+  var Class = this.Class || exports;
   var _ = Class.root._;
 
   Class.definition.push("statics");
   Class.statics = function(clazz, statics) {
     _.extend(clazz, statics);
   };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  PROPERTIES PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
-  var _ = Class.root._;
+  var Class = this.Class || exports;
+  var _ = this._;
 
   Class.error = Class.error || function(error) {
     throw error;
@@ -443,29 +448,31 @@
   var firstUp = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1);
   };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  MEMBERS PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
-  var _ = Class.root._;
+  var Class = this.Class || exports;
+  var _ = this._;
 
   Class.definition.push("members");
   Class.members = function(clazz, members) {
     _.extend(clazz.prototype, members);
   };
-})(Class);
+}).call(this);
 
 
 // =====================================
 //  INTERFACES PLUGIN
 // =====================================
-(function(Class) {
+(function() {
   "use strict";
-  var _ = Class.root._;
+  var Class = this.Class || exports;
+  var _ = this._;
 
   Class.definition.push("interfaces");
   Class.interfaces = function(clazz, interfaces) {
@@ -479,4 +486,4 @@
       }
     });
   };
-})(Class);
+}).call(this);
