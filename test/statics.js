@@ -1,4 +1,9 @@
-module("statics");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("statics");
+} else {
+  module("statics");
+}
 
 
 test("Singleton definition", function () {

@@ -1,10 +1,14 @@
-module("properties ECMA5");
-
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("properties ECMA5");
+} else {
+  module("properties ECMA5");  
+}
 
 test("Properties basic", function () {
 
-  if (window.__defineSetter__) {
-    
+  if (this.__defineSetter__) {
+
     Class.ECMA5 = true;
 
     var MyType = function() {

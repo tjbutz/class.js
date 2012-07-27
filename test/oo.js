@@ -1,4 +1,9 @@
-module("oo");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("oo");
+} else {
+  module("oo");
+}
 
 
 test("Class creation", function () {
@@ -133,8 +138,8 @@ test("Namepsace By Defintion", function () {
     namespace : "my.cool.Class2"
   });
 
-  equal(my.cool.Class, MyClass, "Class1 found in namespace");
-  equal(my.cool.Class2, MyClass2, "Class2 found in namespace");
+  equal(Class.root.my.cool.Class, MyClass, "Class1 found in namespace");
+  equal(Class.root.my.cool.Class2, MyClass2, "Class2 found in namespace");
 });
 
 

@@ -1,4 +1,9 @@
-module("mixins");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module(".mixins");
+} else {
+  module(".mixins");
+}
 
 test("Literal Mixins", function () {
   var Mixin1 = {

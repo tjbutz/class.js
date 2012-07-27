@@ -1,4 +1,9 @@
-module("members");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("members");
+} else {
+  module("members");
+}
 
 
 test("Members definition", function () {

@@ -1,4 +1,9 @@
-module("interfaces");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("interfaces");
+} else {
+  module("interfaces");
+}
 
 test("Literal Interfaces", function () {
   var Interface1 = {

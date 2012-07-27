@@ -1,4 +1,9 @@
-module("singleton");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("singleton");
+} else {
+  module("singleton");
+}
 
 test("Singleton definition", function () {
   var MyClass = Class.define({

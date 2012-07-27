@@ -1,4 +1,9 @@
-module("properties");
+if (typeof exports !== "undefined") {
+  var Class = require("../class");
+  QUnit.module("properties");
+} else {
+  module("properties");
+}
 
 // validation (+ error msg)
 
