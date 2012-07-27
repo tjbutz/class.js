@@ -385,7 +385,9 @@ or use it for validation:
 ```
 
 ## Version History
- 
+
+ * 0.5.2 (2012/7/27, published to npm)
+  * Added node tests
  * 0.5.1 (2012/7/27, published to npm)
   * Node.js fixes
  * 0.5 (2012/7/27, published to npm)
