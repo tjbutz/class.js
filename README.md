@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple (1.93KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.95KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
   * Core:
@@ -385,7 +385,10 @@ or use it for validation:
 ```
 
 ## Version History
- * 0.5 (2012/7/27, not published to npm)
+ 
+ * 0.5.1 (2012/7/27, published to npm)
+  * Node.js fixes
+ * 0.5 (2012/7/27, published to npm)
   * Added ECMA5 getter/setter
   * API stabilization / changes
   * Removed "notfire" event parameter from property setter
