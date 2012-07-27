@@ -319,6 +319,10 @@ or use it for validation:
   * QUnit tests
   * Namespaces
   * Bugfixes
+  * Validation can be an array of validators
+  * Simple properties (prop:type) now possible
+  * Valiator & Formater can now be a member function
+  * More documentation
  * 0.2
   * Bugfixes
   * API Stabilization
