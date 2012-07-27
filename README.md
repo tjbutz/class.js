@@ -311,4 +311,16 @@ or use it for validation:
     console.log("Errors", errors);
   }
 ```
-________________________________________________________________________________________________________________________
+
+## Changelist
+
+ * 0.3
+  * Plugin system
+  * QUnit tests
+  * Namespaces
+  * Bugfixes
+ * 0.2
+  * Bugfixes
+  * API Stabilization
+ * 0.1
+  * Inital release
