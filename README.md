@@ -312,7 +312,7 @@ or use it for validation:
   }
 ```
 
-## Changelist
+## Version History
 
  * 0.3
   * Plugin system
