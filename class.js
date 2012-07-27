@@ -1,5 +1,5 @@
 /**
- * class.js v0.2.1-pre
+ * class.js v0.3
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -22,7 +22,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.2.1-pre';
+  Class.VERSION = '0.3';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -70,6 +70,7 @@
         } else if (superClass) {
           superClass.apply(this, arguments);
         }
+        // TODO: add onBeforeObjectCreate / After hook
       };
 
       // inheritance
@@ -88,6 +89,7 @@
       clazz.prototype.$$error = Class.error;
 
       // add definition
+      // TODO: We need an order here
       for (var key in definition) {
         if (typeof this.definition[key] !== "undefined") {
           this.definition[key].call(this, clazz, definition[key]);
@@ -101,6 +103,8 @@
 
       // provide instance of check
       clazz.prototype.instanceOf = this._instanceOf;
+      
+      // TODO: Add after class created hook
 
       return clazz;
     },
@@ -109,16 +113,8 @@
     error : function(error) {
       throw error;
     },
-    
-    
-    _forProto : function(clazz, definition, handler, scope) {
-      _.each(definition, function(obj) {
-        var obj = _.isFunction(obj) ? obj.prototype : obj;
-        handler.call(scope, obj);
-      });
-    },
-    
-    
+
+
     _instanceOf : function(obj) {
       return this instanceof obj;
     }
@@ -140,7 +136,7 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["namespace"] = Class.namespace = function(clazz, namespace) {
     if (_.isString(clazz)) {
@@ -169,7 +165,7 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["singleton"] = Class.singleton = function(clazz, isSingleton) {
     if (isSingleton) {
@@ -188,11 +184,13 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["mixins"] = Class.mixins = function(clazz, mixins) {
-    this._forProto(clazz, mixins, function(mixin) {
-      _.extend(clazz.prototype, mixin);
+    
+    _.each(mixins, function(obj) {
+      var obj = _.isFunction(obj) ? obj.prototype : obj;
+      _.extend(clazz.prototype, obj);
     });
   };
 }).call(this);
@@ -204,11 +202,12 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["interfaces"] = Class.interfaces = function(clazz, interfaces) {
-    this._forProto(clazz, interfaces, function(inter) {
-      for (var member in inter) {
+    _.each(interfaces, function(obj) {
+      var obj = _.isFunction(obj) ? obj.prototype : obj;
+      for (var member in obj) {
         if (!clazz.prototype[member]) {
           throw new Error('The Class does not implement the interface member "' + member + '"');
         }
@@ -224,7 +223,7 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["members"] = Class.members = function(clazz, members) {
     _.extend(clazz.prototype, members);
@@ -238,7 +237,7 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["statics"] = Class.statics = function(clazz, statics) {
     _.extend(clazz, statics);
@@ -252,7 +251,7 @@
 (function() {
   var root = this;
   var _ = root._;
-  var Class = root.Class;
+  var Class = root.Class = root.Class || {};
 
   Class.definition["properties"] = Class.properties = function(clazz, properties) {
     for (var property in properties) {

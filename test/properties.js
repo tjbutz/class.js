@@ -42,6 +42,8 @@ test("Properties basic", function () {
 
 
 test("Properties format", function () {
+  var property = null;
+  var oldValue = null;
   var MyClass = Class.define({
     properties : {
       foo : {
@@ -58,6 +60,8 @@ test("Properties format", function () {
 
     members : {
       _formatBar : function(value, old, prop) {
+        property = prop;
+        oldValue = old;
         return value + " works";
       }
     }
@@ -70,12 +74,17 @@ test("Properties format", function () {
 
   obj.setBar("Format");
   equal(obj.getBar(), "Format works", "Format with in member section defined function");
+  equal(property, "bar", "Right property is passed as argument");
+  obj.setBar("Old");
+  equal(oldValue, "Format works", "Old value is is passed as argument");
 });
 
 
 test("Properties apply", function () {
   var apply1Called = false;
   var apply2Called = false;
+  var property = null;
+  var oldValue = null;
 
   var MyClass = Class.define({
     properties : {
@@ -94,6 +103,8 @@ test("Properties apply", function () {
     members : {
       _applyBar : function(value, old, prop) {
         apply2Called = true;
+        property = prop;
+        oldValue = old;
       }
     }
   });
@@ -105,6 +116,9 @@ test("Properties apply", function () {
 
   obj.setBar("JO");
   ok(apply2Called, "Apply with in member section defined function");
+  equal(property, "bar", "Right property is passed as argument");
+  obj.setBar("Old");
+  equal(oldValue, "JO", "Old value is is passed as argument");
 });
 
 
@@ -257,6 +271,8 @@ test("Properties events", function () {
 test("Property validation", function () {
   
   var validate1 = false;
+  var property = null;
+  var oldValue = null;
   
   var MyClass = Class.define({
     properties : {
@@ -281,6 +297,8 @@ test("Property validation", function () {
     members : {
       _validateBar : function(value, old, prop) {
         validate1 = true;
+        property = prop;
+        oldValue = old;
         return true;
       }
     }
@@ -295,6 +313,9 @@ test("Property validation", function () {
   
   obj.setBar("no Error");
   ok(validate1, "validation function returns true");
+  equal(property, "bar", "Right property is passed as argument");
+  obj.setBar("Old");
+  equal(oldValue, "no Error", "Old value is is passed as argument");
 
   ok(validate1, "validation function returns true");
 
