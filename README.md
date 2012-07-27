@@ -1,12 +1,12 @@
 class.js
 ========
 
-Simple (1.84KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.89KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
   * Core:
     * Inheritance 
-    * ```__super__``` - reference on super class (Backbone compatible)
+    * ```__super__``` - reference on super class
   * Plugins:
     * Mixins
     * Interfaces
@@ -212,7 +212,7 @@ ________________________________________________________________________________
 Extending types
 
 ```js
-Class.types
+Class.types (provided by properties plugin)
 ```
 
 For example:
@@ -233,13 +233,54 @@ Class.definition
 For example:
 
 ```js
-Class.definition["mykey"] = function(clazz, definition) {
+Class.definition.push("mykey");
+Class.mykey = function(clazz, definition) {
   for (var key in definition) {
     clazz.prototype[key] = function() {
       alert("My New Extension");
     }
   }
 }
+```
+________________________________________________________________________________________________________________________
+
+Class define hooks
+
+```js
+Class.onBeforeClassDefine
+Class.onAfterClassDefine 
+```
+
+For example:
+
+```js
+Class.onBeforeClassDefine = function() {
+  console.log("Before Class Define called");
+ };
+
+Class.onAfterClassDefine = function() {
+  console.log("After Class Define called");
+};
+```
+________________________________________________________________________________________________________________________
+
+Before instantiation hooks
+
+```js
+Class.onBeforeInstantiation
+Class.onAfterInstantiation 
+```
+
+For example:
+
+```js
+Class.onBeforeInstantiation = function() {
+  console.log("Before object is instantiated");
+};
+
+Class.onAfterInstantiation = function() {
+  console.log("After object is instantiated");
+};
 ```
 ________________________________________________________________________________________________________________________
 
@@ -313,7 +354,16 @@ or use it for validation:
 ```
 
 ## Version History
- 
+ * 0.4 (2012/7/27, not yet published to npm)
+  * Improved plugin system
+  * Added strict mode
+  * API stabilization / changes
+    * Removed instanceOf method
+    * Class.definition is now an array to ensure order of execution
+  * Before / After Class definition hooks
+  * Before / After instantiation hooks
+  * Bugfixes
+  * More tests
  * 0.3 (2012/7/27, not yet published to npm)
   * Plugin system
   * QUnit tests
@@ -325,7 +375,7 @@ or use it for validation:
   * More documentation
  * 0.2 (2012/7/26)
   * Bugfixes
-  * API Stabilization
+  * API stabilization
   * Documentation
  * 0.1.1 (2012/7/26)
   * Minor Bugfixes
@@ -333,10 +383,7 @@ or use it for validation:
  * 0.1 (2012/7/26)
   * Inital release
 
-## ToDo
+## ToDo for 1.0
 
  * Split up plugins
  * use grunt
- * define order of definition plugins
- * hooks for before/after create object
- * hooks for before/after define class

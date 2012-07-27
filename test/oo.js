@@ -24,12 +24,21 @@ test("Class creation without new", function () {
 });
 
 
+test("Instance of test", function () {
+  var MyClass = Class.define();
+  var SomeClass = MyClass.extend();
+  var obj = new SomeClass();
+
+  ok(obj instanceof SomeClass, "Constructor is set right");
+  ok(obj instanceof MyClass, "Instance of super works");
+});
+
 test("Class definition with wrong key", function () {
   throws(function() {
     var SuperClass = Class.define({
       method : {}
     });
-  }, "Create intance without 'new'");
+  }, "Defintion with wrong key fails");
 });
 
 
@@ -114,16 +123,6 @@ test("Explicit constructor call: extend", function () {
   equal(obj.name, "Monkey", "Constructor of super not called");
 });
 
-test("Instance of test", function () {
-  var MyClass = Class.define();
-  var SomeClass = MyClass.extend();
-  var obj = new SomeClass();
-
-  ok(obj.instanceOf(SomeClass), "Constructor is set right");
-  ok(obj.instanceOf(MyClass), "Instance of super works");
-});
-
-
 
 test("Namepsace By Defintion", function () {
   var MyClass = Class.define({
@@ -137,3 +136,49 @@ test("Namepsace By Defintion", function () {
   equal(my.cool.Class, MyClass, "Class1 found in namespace");
   equal(my.cool.Class2, MyClass2, "Class2 found in namespace");
 });
+
+
+test("Class definition hooks", function () {
+  
+  var before = false;
+  var after = false;
+
+  Class.onBeforeClassDefine = function() {
+    before = true;
+  };
+
+  Class.onAfterClassDefine = function() {
+    after = true;
+  };
+
+  var MyClass = Class.define({
+    namespace : "my.cool.Class"
+  });
+
+  ok(before, "onBeforeClassDefiniton handler called");
+  ok(after, "onAfterClassDefiniton handler called");
+});
+
+
+test("OO instantiation hooks", function () {
+  
+  var before = false;
+  var after = false;
+
+  Class.onBeforeInstantiation = function() {
+    before = true;
+  };
+
+  Class.onAfterInstantiation = function() {
+    after = true;
+  };
+
+  var MyClass = Class.define({
+    namespace : "my.cool.Class"
+  });
+  var test = new MyClass();
+
+  ok(before, "onBeforeClassDefiniton handler called");
+  ok(after, "onAfterClassDefiniton handler called");
+});
+

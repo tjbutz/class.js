@@ -24,8 +24,7 @@ test("Extends members", function () {
       superMethod : function() {
         return true;
       },
-      
-      
+
       superMethod2 : function() {
         return true;
       }

@@ -1,5 +1,5 @@
-/**
- * class.js v0.3
+/*!
+ * class.js v0.4
  * https://github.com/tjbutz/class.js
  *
  * (c) 2012 Tino Butz
@@ -8,6 +8,7 @@
  * License: https://github.com/tjbutz/class.js/LICENSE
  */
 (function() {
+  "use strict";
   var root = this;
 
   var _ = root._;
@@ -22,7 +23,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.3';
+  Class.VERSION = '0.4';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -30,28 +31,12 @@
     return this;
   };
 
-
   var tempConstructor = function() {};
 
   _.extend(Class, {
     
-    definition : {},
-
-    types : {
-      "String" : _.isString,
-      "Number" : _.isNumber,
-      "Boolean" : _.isBoolean,
-      "Array" : _.isArray,
-      "Function" : _.isFunction,
-      "Object" : _.isObject,
-      "Element" : _.isElement,
-      "Regex" : _.isRegExp
-    },
-
-    _extend : function(definition) {
-      return Class.define(this, definition);
-    },
-
+    // Extension point for the class definition
+    definition : [],
 
     define : function(superClass, definition) {
       if (!_.isFunction(superClass)) {
@@ -59,18 +44,27 @@
         superClass = null;
       }
 
+      Class.onBeforeClassDefine && Class.onBeforeClassDefine(superClass, definition);
+
       // constructor
-      var constructor = definition && definition.hasOwnProperty("constructor") ? definition.constructor : null;
+      var constructor = null;
+      if (definition && definition.hasOwnProperty("constructor")) {
+        constructor =  definition.constructor;
+        delete definition.constructor;
+      }
+
+      // use clazz instead of class as it is a reserved keyword
       var clazz = function() {
         if (!(this instanceof clazz)) {
           throw new Error("Use new keyword to create a new instance or call/apply class with right scope");
         }
+        Class.onBeforeInstantiation && Class.onBeforeInstantiation(this);
         if (constructor) {
           constructor.apply(this, arguments);
         } else if (superClass) {
           superClass.apply(this, arguments);
         }
-        // TODO: add onBeforeObjectCreate / After hook
+        Class.onAfterInstantiation && Class.onAfterInstantiation(this);
       };
 
       // inheritance
@@ -85,38 +79,32 @@
         clazz.prototype.__super__ = superClass.prototype;
       }
 
-      // add error handler
-      clazz.prototype.$$error = Class.error;
-
       // add definition
-      // TODO: We need an order here
-      for (var key in definition) {
-        if (typeof this.definition[key] !== "undefined") {
-          this.definition[key].call(this, clazz, definition[key]);
-        } else {
-          throw new Error("Unknown key in definition: " + key + ". Allowed keys are: " + _.keys(this.definition).join(", "));
-        }
+      // definitons are called in order they were added
+      if (definition) {
+        _.each(this.definition, function(key) {
+          if (typeof definition[key] !== "undefined") {
+            this[key].call(this, clazz, definition[key]);
+            delete definition[key]; // Clean up memory
+          }
+        }, this);
+        if (_.keys(definition).length != 0) {
+          throw new Error("Unknown key in definition: " + key + ". Allowed keys are: " + this.definition.join(", ")); 
+        }     
       }
+      
 
       // provide extend method for inheritance
       clazz.extend = this._extend;
 
-      // provide instance of check
-      clazz.prototype.instanceOf = this._instanceOf;
-      
-      // TODO: Add after class created hook
+      Class.onAfterClassDefine && Class.onAfterClassDefine(clazz);
 
       return clazz;
     },
-
-
-    error : function(error) {
-      throw error;
-    },
-
-
-    _instanceOf : function(obj) {
-      return this instanceof obj;
+    
+    
+    _extend : function(definition) {
+      return Class.define(this, definition);
     }
   });
 
@@ -133,12 +121,12 @@
 // =====================================
 //  NAMESPACE PLUGIN
 // =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
 
-  Class.definition["namespace"] = Class.namespace = function(clazz, namespace) {
+  Class.definition.push("namespace");
+  Class.namespace = function(clazz, namespace) {
     if (_.isString(clazz)) {
       var tempClass = namespace;
       namespace = clazz;
@@ -148,26 +136,25 @@
     var root = this.root;
     if (namespace.length > 0) {
       var className = namespace.pop();
-      for (var i=0, l = namespace.length; i < l; i++) {
-        var part = namespace[i];
-        root = root[part] = root[part] || {};
-      }
+      _.each(namespace, function(part) {
+        root = root[part] = root[part] || {};        
+      });
       root[className] = clazz;
     }
     return clazz;
  };
-}).call(this);
+})(Class);
 
 
 // =====================================
 //  SINGLETON PLUGIN
 // =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
 
-  Class.definition["singleton"] = Class.singleton = function(clazz, isSingleton) {
+  Class.definition.push("singleton");
+  Class.singleton = function(clazz, isSingleton) {
     if (isSingleton) {
       clazz.$$instance = null;
       clazz.getInstance = function() {
@@ -175,85 +162,64 @@
       };
     }
   };
-}).call(this);
+})(Class);
 
 
 // =====================================
 //  MIXINS PLUGIN
 // =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
 
-  Class.definition["mixins"] = Class.mixins = function(clazz, mixins) {
-    
+  Class.definition.push("mixins");
+  Class.mixins = function(clazz, mixins) {
     _.each(mixins, function(obj) {
       var obj = _.isFunction(obj) ? obj.prototype : obj;
       _.extend(clazz.prototype, obj);
     });
   };
-}).call(this);
-
-
-// =====================================
-//  INTERFACES PLUGIN
-// =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
-
-  Class.definition["interfaces"] = Class.interfaces = function(clazz, interfaces) {
-    _.each(interfaces, function(obj) {
-      var obj = _.isFunction(obj) ? obj.prototype : obj;
-      for (var member in obj) {
-        if (!clazz.prototype[member]) {
-          throw new Error('The Class does not implement the interface member "' + member + '"');
-        }
-      }
-    });
-  };
-}).call(this);
-
-
-// =====================================
-//  MEMBERS PLUGIN
-// =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
-
-  Class.definition["members"] = Class.members = function(clazz, members) {
-    _.extend(clazz.prototype, members);
-  };
-}).call(this);
+})(Class);
 
 
 // =====================================
 //  STATICS PLUGIN
 // =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
 
-  Class.definition["statics"] = Class.statics = function(clazz, statics) {
+  Class.definition.push("statics");
+  Class.statics = function(clazz, statics) {
     _.extend(clazz, statics);
   };
-}).call(this);
+})(Class);
 
 
 // =====================================
 //  PROPERTIES PLUGIN
 // =====================================
-(function() {
-  var root = this;
-  var _ = root._;
-  var Class = root.Class = root.Class || {};
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
 
-  Class.definition["properties"] = Class.properties = function(clazz, properties) {
+  Class.error = Class.error || function(error) {
+    throw error;
+  };
+
+  Class.types = {
+    "String" : _.isString,
+    "Number" : _.isNumber,
+    "Boolean" : _.isBoolean,
+    "Array" : _.isArray,
+    "Function" : _.isFunction,
+    "Object" : _.isObject,
+    "Element" : _.isElement,
+    "Regex" : _.isRegExp
+  };
+
+  Class.definition.push("properties");
+  Class.properties = function(clazz, properties) {
     for (var property in properties) {
       createProperty(clazz, property, properties[property]);
     }
@@ -317,7 +283,7 @@
     var prop = firstUp(property);
 
      // define getter function name
-     name = method + prop;
+     var name = method + prop;
      if (definition[method === "is" ? "get" : method] === false) {
        name = "_" + name;
      }
@@ -361,13 +327,13 @@
       var type = definition.type;
       var skip = _.isNull(value) && definition.nullable === true
       if (!skip && type) {
-        var assert = _.isFunction(type) ? this.instanceOf : Class.types[type];
+        var assert = _.isFunction(type) ? instaneOf : Class.types[type];
         if (assert) {
           if (!assert.call(this, value)) {
             var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);
             msg += '. Allowed keys are: ' + _.keys(Class.types).join(", ");
             var error = new Class.TypeError(msg, property, value, type);
-            this.$$error.call(this, error);
+            Class.error.call(this, error);
             return;
           }
         } else {
@@ -391,7 +357,7 @@
             var isString = _.isString(check);
             if (!check || isString) {
               var msg = isString ? check : 'Validation for property "' + property + '" with value "' + value + '" failed';
-              this.$$error.call(this, new Class.ValidationError(msg, property, value));
+              Class.error.call(this, new Class.ValidationError(msg, property, value));
               return;
             }
           } else {
@@ -456,9 +422,48 @@
       this.type = type;
     }
   });
-  
-  
+
+  var instaneOf = function(obj) {
+    return this instanceof obj;
+  };
+
   var firstUp = function(str) {
     return str.charAt(0).toUpperCase() + str.substring(1);
   };
-}).call(this);
+})(Class);
+
+
+// =====================================
+//  MEMBERS PLUGIN
+// =====================================
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
+
+  Class.definition.push("members");
+  Class.members = function(clazz, members) {
+    _.extend(clazz.prototype, members);
+  };
+})(Class);
+
+
+// =====================================
+//  INTERFACES PLUGIN
+// =====================================
+(function(Class) {
+  "use strict";
+  var _ = Class.root._;
+
+  Class.definition.push("interfaces");
+  Class.interfaces = function(clazz, interfaces) {
+    _.each(interfaces, function(inter) {
+      var inter = _.isFunction(inter) ? inter.prototype : inter;
+      for (var name in inter) {
+        var method = clazz.prototype[name];
+        if (typeof method === 'undefined' || !_.isFunction(method)) {
+          throw new Error('The Class does not implement the interface method "' + method + '"');
+        }          
+      }
+    });
+  };
+})(Class);

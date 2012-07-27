@@ -30,6 +30,30 @@ test("Literal Mixins", function () {
 });
 
 
+test("Tests order of class definition", function () {
+  var Mixin = {
+    bar : function() {
+      return true;
+    }
+  };
+
+  var MyClass = Class.define({
+    members : {
+      foo : function() {
+        return true;
+      }
+    },
+    
+    interfaces : [{foo:true}],
+    mixins : [Mixin]
+  });
+
+  var obj = new MyClass();
+  ok(true, "Class definitions are in the right order");
+  equal(obj.bar(), true, "Method bar defined and returns the right value");
+});
+
+
 test("Class Mixins", function () {
   var Mixin1 = Class.define({
     members : {

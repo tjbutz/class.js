@@ -2,7 +2,7 @@ module("interfaces");
 
 test("Literal Interfaces", function () {
   var Interface1 = {
-    foo : function() {}
+    foo : true
   };
   
   var Interface2 = {
@@ -26,13 +26,16 @@ test("Literal Interfaces", function () {
 test("Class Interfaces", function () {
   var Interface1 = Class.define({
     members : {
-      foo : function() {
-        return false;
+      some : function() {
+        
       }
     }
   });
   
   var Interface2 = Class.define({
+    properties : {
+      foo : "Boolean"
+    },
     members : {
       bar : function() {
         return true;
@@ -42,15 +45,18 @@ test("Class Interfaces", function () {
 
 
   var MyClass = Class.define({
-    mixins : [Interface1, Interface2],
+    interfaces : [Interface1, Interface2],
 
+    properties : {
+      foo : "Boolean"
+    },
     members : {
-      foo : function() {
-        return true;
-      },
-      
       bar : function() {
         return true;
+      },
+
+      some : function() {
+
       }
     }
   });
