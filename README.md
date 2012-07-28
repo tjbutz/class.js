@@ -478,5 +478,4 @@ or use it for validation:
 
 ## ToDo for 1.0
 
- * Split up plugins
- * use grunt
+ * Examples
