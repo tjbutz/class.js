@@ -1,7 +1,7 @@
 {
   "name"          : "classjs",
   "description"   : "Simple Class System for JavaScript",
-  "version"       : "0.6",
+  "version"       : "0.6.0",
   "author"        : "Tino Butz <tinobutz@gmail.com>",
   "url"           : "https://github.com/tjbutz/class.js",
   "keywords"      : ["util", "server", "client", "browser", "class", "inheritance"],
