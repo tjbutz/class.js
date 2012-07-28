@@ -429,7 +429,7 @@ or use it for validation:
 
 ## Version History
 
- * 0.6 (2012/7/28, not published to npm)
+ * 0.6 (2012/7/28, published to npm)
   * Splitted up files
   * Use grunt to build project
   * Interfaces can now have parameter checks
