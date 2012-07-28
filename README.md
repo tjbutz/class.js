@@ -6,7 +6,7 @@ Simple (1.98KB minified & gzipped & all features) class system for JavaScript. D
 ## Features
   * Core:
     * Inheritance 
-    * ```__super__``` - reference on super class
+    * ```__super__``` - reference to super class
   * Plugins:
     * Mixins
     * Interfaces
