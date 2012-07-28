@@ -1,12 +1,5 @@
-/*!
- * class.js v0.5.2
- * https://github.com/tjbutz/class.js
- *
- * (c) 2012 Tino Butz
- * class.js may be freely distributed under the MIT license.
- *
- * License: https://github.com/tjbutz/class.js/LICENSE
- */
+/*! class.js v0.6 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+
 (function() {
   "use strict";
   var root = this;
@@ -88,8 +81,8 @@
             delete definition[key]; // Clean up memory
           }
         }, this);
-        if (_.keys(definition).length != 0) {
-          throw new Error("Unknown key in definition: " + key + ". Allowed keys are: " + this.definition.join(", ")); 
+        if (_.keys(definition).length !== 0) {
+          throw new Error("Unknown key in definition: " + _.keys(definition).join(", ") + ". Allowed keys are: " + this.definition.join(", ")); 
         }     
       }
       
@@ -109,18 +102,6 @@
   });
 
 }).call(this);
-
-// =====================================
-//  PLUGINS
-// =====================================
-//  You can customize this file by
-//  removing plugins below this section
-// =====================================
-
-
-// =====================================
-//  NAMESPACE PLUGIN
-// =====================================
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -132,7 +113,7 @@
       var tempClass = namespace;
       namespace = clazz;
       clazz = tempClass;
-    };
+    }
     namespace = namespace.split(".");
     var root = this.root;
     if (namespace.length > 0) {
@@ -145,11 +126,6 @@
     return clazz;
  };
 }).call(this);
-
-
-// =====================================
-//  SINGLETON PLUGIN
-// =====================================
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -157,37 +133,14 @@
 
   Class.definition.push("singleton");
   Class.singleton = function(clazz, isSingleton) {
-    if (isSingleton) {
-      clazz.$$instance = null;
-      clazz.getInstance = function() {
-        return this.$$instance || (this.$$instance = new this());
-      };
-    }
+   if (isSingleton) {
+     clazz.$$instance = null;
+     clazz.getInstance = function() {
+       return this.$$instance || (this.$$instance = new this());
+     };
+   }
   };
 }).call(this);
-
-
-// =====================================
-//  MIXINS PLUGIN
-// =====================================
-(function() {
-  "use strict";
-  var Class = this.Class || exports;
-  var _ = Class.root._;
-
-  Class.definition.push("mixins");
-  Class.mixins = function(clazz, mixins) {
-    _.each(mixins, function(obj) {
-      var obj = _.isFunction(obj) ? obj.prototype : obj;
-      _.extend(clazz.prototype, obj);
-    });
-  };
-}).call(this);
-
-
-// =====================================
-//  STATICS PLUGIN
-// =====================================
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -195,14 +148,9 @@
 
   Class.definition.push("statics");
   Class.statics = function(clazz, statics) {
-    _.extend(clazz, statics);
+   _.extend(clazz, statics);
   };
 }).call(this);
-
-
-// =====================================
-//  PROPERTIES PLUGIN
-// =====================================
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -265,7 +213,7 @@
     if (!_.isObject(definition)) {
       definition = {
         type : definition
-      }
+      };
     }
     
     var proto = clazz.prototype;
@@ -343,7 +291,7 @@
       }
       // add type check
       var type = definition.type;
-      var skip = _.isNull(value) && definition.nullable === true
+      var skip = _.isNull(value) && definition.nullable === true;
       if (!skip && type) {
         var assert = _.isFunction(type) ? instaneOf : Class.types[type];
         if (assert) {
@@ -449,11 +397,19 @@
     return str.charAt(0).toUpperCase() + str.substring(1);
   };
 }).call(this);
+(function() {
+   "use strict";
+   var Class = this.Class || exports;
+   var _ = Class.root._;
 
-
-// =====================================
-//  MEMBERS PLUGIN
-// =====================================
+   Class.definition.push("mixins");
+   Class.mixins = function(clazz, mixins) {
+     _.each(mixins, function(obj) {
+       var obj = _.isFunction(obj) ? obj.prototype : obj;
+       _.extend(clazz.prototype, obj);
+     });
+   };
+ }).call(this);
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -461,14 +417,9 @@
 
   Class.definition.push("members");
   Class.members = function(clazz, members) {
-    _.extend(clazz.prototype, members);
+   _.extend(clazz.prototype, members);
   };
 }).call(this);
-
-
-// =====================================
-//  INTERFACES PLUGIN
-// =====================================
 (function() {
   "use strict";
   var Class = this.Class || exports;
@@ -476,14 +427,23 @@
 
   Class.definition.push("interfaces");
   Class.interfaces = function(clazz, interfaces) {
-    _.each(interfaces, function(inter) {
-      var inter = _.isFunction(inter) ? inter.prototype : inter;
-      for (var name in inter) {
-        var method = clazz.prototype[name];
-        if (typeof method === 'undefined' || !_.isFunction(method)) {
-          throw new Error('The Class does not implement the interface method "' + method + '"');
-        }          
-      }
-    });
+   _.each(interfaces, function(inter) {
+     var inter = _.isFunction(inter) ? inter.prototype : inter;
+     for (var name in inter) {
+       var method = clazz.prototype[name];
+       if (typeof method === 'undefined' || !_.isFunction(method)) {
+         throw new Error('The Class does not implement the interface method "' + method + '"');
+       } else if (_.isFunction(inter[name])) {
+         clazz.prototype[name] = wrap(inter[name], method);
+       }        
+     }
+   });
+  };
+
+  var wrap = function(inter, method) {
+    return function() {
+      inter.apply(this, arguments);
+      return method.apply(this, arguments);
+    };
   };
 }).call(this);

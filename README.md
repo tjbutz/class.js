@@ -1,7 +1,7 @@
 class.js
 ========
 
-Simple (1.95KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
+Simple (1.98KB minified & gzipped & all features) class system for JavaScript. Designed to work with backbone.js and node.js.
 
 ## Features
   * Core:
@@ -48,13 +48,55 @@ npm install classjs
 require("classjs");
 ```
 
+## Tests & Custom Builds
+
+class.js is using grunt (https://github.com/cowboy/grunt) to build the modules and to run the tests.
+If you would like to create a custom build of class.js or develop a feature, please follow these steps:
+
+To install Grunt run the follwing command (npm (http://npmjs.org/) needed):
+ 
+```
+npm install -g grunt
+```
+
+Test & Build the project, run:
+```
+grunt
+```
+
+Automatically build project whenever a lib/*.js file is changed:
+```
+grunt watch
+```
+
+Run tests only:
+```
+grunt qunit
+```
+
+The tests are located in the ```test``` folder. With the index*.html files you can run the tests manually in any browser you want.
+
+
 ## Example
 
 
 ```js
 
+var ICompany = {
+  addEmploye : function(employe) {
+    // Check passed arguments
+    if (Array.prototype.slice.call(arguments).length != 1) {
+      throw new Error("Wrong length of arguments");
+    }
+    if (typeof employe !== "object") {
+      throw new Error("Wrong type for argument employe");
+    }
+  }
+};
+
 // Define a new class. Extend from EventEmitter.
 var Company = Class.define(EventEmitter, {
+  interfaces : [ICompany],
 	properties : {
 		activated : "Boolean",
 		name : {
@@ -262,6 +304,28 @@ Class.onAfterClassDefine = function() {
   console.log("After Class Define called");
 };
 ```
+
+Before instantiation hooks
+
+```js
+Class.onBeforeInstantiation
+Class.onAfterInstantiation 
+```
+
+________________________________________________________________________________________________________________________
+
+For example:
+
+```js
+Class.onBeforeInstantiation = function() {
+  console.log("Before object is instantiated");
+};
+
+Class.onAfterInstantiation = function() {
+  console.log("After object is instantiated");
+};
+```
+
 ________________________________________________________________________________________________________________________
 
 ECMA5 Getter / Setter
@@ -290,26 +354,6 @@ var obj = new MyClass();
 obj.bar = 1 // no setBar(1) needed
 var bar = obj.bar; // no getBar() needed
 obj.foo = "string" // will throw an exception
-```
-________________________________________________________________________________________________________________________
-
-Before instantiation hooks
-
-```js
-Class.onBeforeInstantiation
-Class.onAfterInstantiation 
-```
-
-For example:
-
-```js
-Class.onBeforeInstantiation = function() {
-  console.log("Before object is instantiated");
-};
-
-Class.onAfterInstantiation = function() {
-  console.log("After object is instantiated");
-};
 ```
 ________________________________________________________________________________________________________________________
 
@@ -386,6 +430,11 @@ or use it for validation:
 
 ## Version History
 
+ * 0.6
+  * Splitted up files
+  * Use grunt to build project
+  * Interfaces can now have parameter checks
+  * API & Feature freeze for 1.0
  * 0.5.2 (2012/7/27, published to npm)
   * Added node tests
  * 0.5.1 (2012/7/27, published to npm)
@@ -394,7 +443,6 @@ or use it for validation:
   * Added ECMA5 getter/setter
   * API stabilization / changes
   * Removed "notfire" event parameter from property setter
-  * API & Feature freeze for 1.0
  * 0.4 (2012/7/27, not published to npm)
   * Improved plugin system
   * Added strict mode
@@ -423,6 +471,11 @@ or use it for validation:
   * Docu
  * 0.1 (2012/7/26)
   * Inital release
+
+## Contribute
+
+ * If you have a feature request or an issue please report it here: https://github.com/tjbutz/class.js/issues
+ * If you have developed a plugin for class.js please let me know. I will list the plugin on this page.
 
 ## ToDo for 1.0
 
