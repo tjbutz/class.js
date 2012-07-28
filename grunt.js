@@ -73,7 +73,7 @@ module.exports = function(grunt) {
   // Default task.
 //  grunt.registerTask('default', 'lint test concat min');
 
-  grunt.registerTask('default', 'qunit concat min');
+  grunt.registerTask('default', 'concat min qunit');
   
   grunt.registerTask("qunit", function( commit, configFile ) {
     var done = this.async();
