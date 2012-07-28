@@ -48,35 +48,6 @@ npm install classjs
 require("classjs");
 ```
 
-## Tests & Custom Builds
-
-class.js is using grunt (https://github.com/cowboy/grunt) to build the modules and to run the tests.
-If you would like to create a custom build of class.js or develop a feature, please follow these steps:
-
-To install Grunt run the follwing command (npm (http://npmjs.org/) needed):
- 
-```
-npm install -g grunt
-```
-
-Test & Build the project, run:
-```
-grunt
-```
-
-Automatically build project whenever a lib/*.js file is changed:
-```
-grunt watch
-```
-
-Run tests only:
-```
-grunt qunit
-```
-
-The tests are located in the ```test``` folder. With the index*.html files you can run the tests manually in any browser you want.
-
-
 ## Example
 
 
@@ -161,6 +132,34 @@ company.on("nameChanged", function(data) {
 company.addEmploye({name:"Lena"});
 company.setName("My new Company");
 ```
+
+## Tests & Custom Builds
+
+class.js is using grunt (https://github.com/cowboy/grunt) to build the modules and to run the tests.
+If you would like to create a custom build of class.js or develop a feature, please follow these steps:
+
+To install Grunt run the follwing command (npm (http://npmjs.org/) needed):
+ 
+```
+npm install -g grunt
+```
+
+Test & Build the project, run:
+```
+grunt
+```
+
+Automatically build project whenever a lib/*.js file is changed:
+```
+grunt watch
+```
+
+Run tests only:
+```
+grunt qunit
+```
+
+The tests are located in the ```test``` folder. With the index*.html files you can run the tests manually in any browser you want.
 
 ## API
 
