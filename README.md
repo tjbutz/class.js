@@ -429,7 +429,7 @@ or use it for validation:
 
 ## Version History
 
- * 0.6.1 (2012/7/29, not yet released)
+ * 0.6.1 (2012/7/29, published to npm)
   * Improved ECMA5 property support
   * Do not set the same value for a property twice
   * Removed Class.error handling from property system
