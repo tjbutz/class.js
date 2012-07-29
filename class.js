@@ -144,7 +144,7 @@
 (function() {
   "use strict";
   var Class = this.Class || exports;
-  var _ = Class.root._;
+  var _ = this._;
 
   Class.definition.push("statics");
   Class.statics = function(clazz, statics) {
@@ -182,7 +182,7 @@
   };
 
 
-  var createGenericSetter = function(prefix) {
+  var createGenericSetter = function(visibility) {
     return function(properties, value) {
       if (_.isString(properties)) {
         var property = properties;
@@ -190,20 +190,12 @@
         properties[property] = value;
       }
       for (var property in properties) {
-        var setter;
-        if (!Class.ECMA5) {
-          setter = prefix + "set" + firstUp(property);          
-        } else {
-          setter = prefix + property;
-        }
-
+        var setter = getPropertyMethodName("set", property, visibility);
         if (this[setter] !== undefined) {
-          var value = properties[property];
-          !Class.ECMA5 ? this[setter](value) : (this[setter] = value);
+          set(this, setter, properties[property]);
         } else {
           throw new Error('No public set method for property "' + property + '" found.');
         }
-
       }
       return this;
     };
@@ -217,13 +209,12 @@
         type : definition
       };
     }
-    
-    var proto = clazz.prototype;
-
-    var setter = getPropertyMethodName(property, definition, "set");
-    var getter = getPropertyMethodName(property, definition, "get");
 
     // add setter & getter
+    var setter = getPropertyMethodName("set", property, getPropertyVisibility("set", definition));
+    var getter = getPropertyMethodName("get", property, getPropertyVisibility("get", definition));
+
+    var proto = clazz.prototype;
     if (!Class.ECMA5) {
       proto[setter] = createSetter(property, definition, getter, setter);
       proto[getter] = createGetter(property, definition, getter, setter);
@@ -234,28 +225,20 @@
 
     // add "is" function for boolean
     if (definition.type === "Boolean") {
-      var is = getPropertyMethodName(property, definition, "is");
+      var is = getPropertyMethodName("is", property, getPropertyVisibility(definition, "is"));
       proto[is] = createIs(property, definition, getter, setter);
     }
   };
 
 
-  var getPropertyMethodName = function(property, definition, method) {
-    // define getter function / propety name
-    var name;
-    if (!Class.ECMA5 || method === "is") {
-      name = method + firstUp(property);
-    } else {
-      name = property;
-    }
+  var getPropertyMethodName = function(method, property, visibility) {
+    return (!Class.ECMA5 || method === "is") ? (visibility + method + firstUp(property)) : (visibility + property);
+  };
+  
 
-    // visibility for definition.get / definition.set
-    if (definition[method === "is" ? "get" : method] === false) {
-      name = "_" + name;
-    }
-
-    return name;
-   };
+  var getPropertyVisibility = function(method, definition) {
+    return definition[method === "is" ? "get" : method] === false ? "_" : "";
+  };
 
 
   var createGetter = function(property, definition, getter, setter) {
@@ -265,27 +248,25 @@
       if (typeof definition.init !== "undefined") {
         var init = definition.init;
         delete definition.init;
-        if (!Class.ECMA5) {
-          this[setter](init);          
-        } else {
-          this[setter] = init;
-        }
+        set(this, setter, init);
       }
 
       return this.$$properties[property];
     };
   };
 
+  var set = function(obj, setter, value) {
+    !Class.ECMA5 ? obj[setter](value) : (obj[setter] = value);
+  };
+
+  var get = function(obj, getter) {
+    return !Class.ECMA5 ? obj[getter]() : obj[getter];
+  };
 
   var createSetter = function(property, definition, getter, setter) {
     return function(value) {
       
-      var old;
-      if (!Class.ECMA5) {
-        old = this[getter]();        
-      } else {
-        old = this[getter];
-      }
+      var old = get(this, getter);
 
       // add format function
       if (definition.format) {
@@ -378,7 +359,7 @@
 
   var createIs = function(property, definition, getter, setter) {
     return function() {
-      return !Class.ECMA5 ? this[getter]() : this[getter];
+      return get(this, getter);
     };
   };
 
@@ -411,17 +392,17 @@
   };
 }).call(this);
 (function() {
-   "use strict";
-   var Class = this.Class || exports;
-   var _ = Class.root._;
+  "use strict";
+  var Class = this.Class || exports;
+  var _ = this._;
 
-   Class.definition.push("mixins");
-   Class.mixins = function(clazz, mixins) {
-     _.each(mixins, function(obj) {
-       var obj = _.isFunction(obj) ? obj.prototype : obj;
-       _.extend(clazz.prototype, obj);
-     });
-   };
+  Class.definition.push("mixins");
+  Class.mixins = function(clazz, mixins) {
+    _.each(mixins, function(obj) {
+      var obj = _.isFunction(obj) ? obj.prototype : obj;
+      _.extend(clazz.prototype, obj);
+    });
+  };
  }).call(this);
 (function() {
   "use strict";
