@@ -1,4 +1,4 @@
-/*! class.js v0.6 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+/*! class.js v0.6.1 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
 
 (function() {
   "use strict";
@@ -16,7 +16,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.5.2';
+  Class.VERSION = '0.6.1';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -181,8 +181,8 @@
 
     // add batch property set method
     var proto = clazz.prototype;
-    proto.set = createGenericSetter("set");
-    proto._set = createGenericSetter("_set");
+    proto.set = createGenericSetter("");
+    proto._set = createGenericSetter("_");
   };
 
 
@@ -194,10 +194,16 @@
         properties[property] = value;
       }
       for (var property in properties) {
-        var prop = firstUp(property);
-        var setter = prefix + prop;
-        if (this[setter]) {
-          this[setter](properties[property]);
+        var setter;
+        if (!Class.ECMA5) {
+          setter = prefix + "set" + firstUp(property);          
+        } else {
+          setter = prefix + property;
+        }
+
+        if (this[setter] !== undefined) {
+          var value = properties[property];
+          !Class.ECMA5 ? this[setter](value) : (this[setter] = value);
         } else {
           throw new Error('No public set method for property "' + property + '" found.');
         }
@@ -226,8 +232,8 @@
       proto[setter] = createSetter(property, definition, getter, setter);
       proto[getter] = createGetter(property, definition, getter, setter);
     } else {
-      proto.__defineSetter__(property, createSetter(property, definition, getter, setter));  
-      proto.__defineGetter__(property, createGetter(property, definition, getter, setter));
+      proto.__defineSetter__(setter, createSetter(property, definition, getter, setter));  
+      proto.__defineGetter__(getter, createGetter(property, definition, getter, setter));
     }
 
     // add "is" function for boolean
@@ -239,15 +245,20 @@
 
 
   var getPropertyMethodName = function(property, definition, method) {
-    var prop = firstUp(property);
+    // define getter function / propety name
+    var name;
+    if (!Class.ECMA5 || method === "is") {
+      name = method + firstUp(property);
+    } else {
+      name = property;
+    }
 
-     // define getter function name
-     var name = method + prop;
-     if (definition[method === "is" ? "get" : method] === false) {
-       name = "_" + name;
-     }
+    // visibility for definition.get / definition.set
+    if (definition[method === "is" ? "get" : method] === false) {
+      name = "_" + name;
+    }
 
-     return name;
+    return name;
    };
 
 
@@ -261,7 +272,7 @@
         if (!Class.ECMA5) {
           this[setter](init);          
         } else {
-          this[property] = init;
+          this[setter] = init;
         }
       }
 
@@ -277,7 +288,7 @@
       if (!Class.ECMA5) {
         old = this[getter]();        
       } else {
-        old = this[property];
+        old = this[getter];
       }
 
       // add format function
@@ -289,6 +300,12 @@
           throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
         }
       }
+
+      // Do not set the same value twice
+      if (old === value) {
+        return;
+      }
+
       // add type check
       var type = definition.type;
       var skip = _.isNull(value) && definition.nullable === true;
@@ -365,7 +382,7 @@
 
   var createIs = function(property, definition, getter, setter) {
     return function() {
-      return this[getter]();
+      return !Class.ECMA5 ? this[getter]() : this[getter];
     };
   };
 

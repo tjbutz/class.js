@@ -171,6 +171,12 @@ test("Generic set", function () {
   equal(obj.getFoo(), "Hi", "Generic setter for string");
   equal(obj.getBar(), false, "Generic setter for boolean");
   
+  throws(function() {
+    obj.set({
+      some : "Hi"
+    });    
+  }, "No setter found");
+  
   obj.set("bar", true);
   equal(obj.getBar(), true, "Generic key, value setter works");
 });

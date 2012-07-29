@@ -429,6 +429,10 @@ or use it for validation:
 
 ## Version History
 
+ * 0.6.1 (2012/7/29, not yet released)
+  * Improved ECMA5 property support
+  * Do not set the same value for a property twice
+  * Bugfixes
  * 0.6 (2012/7/28, published to npm)
   * Splitted up files
   * Use grunt to build project
