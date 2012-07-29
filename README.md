@@ -363,10 +363,9 @@ Class.ValidationError
 Class.TypeError // extends from validation error
 ```
 
-For example you can override the default error handler for class.js:
+In your error handler you can check for the type:
 
 ```js
-  Class.error = function(error) {
     if (error instanceof Class.TypeError) {
       console.log(error.message);
       console.log(error.type);
@@ -379,9 +378,6 @@ For example you can override the default error handler for class.js:
       console.log(error.value);
       console.log(error.property);
     }
-
-    throw error;
-  }
 ```
 
 or use it for validation: 
