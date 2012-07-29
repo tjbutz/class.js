@@ -156,10 +156,6 @@
   var Class = this.Class || exports;
   var _ = this._;
 
-  Class.error = Class.error || function(error) {
-    throw error;
-  };
-
   Class.ECMA5 = false;
 
   Class.types = {
@@ -316,7 +312,7 @@
 
             var msg = 'Wrong type for property "' + property + '". Expected value "' + value + '" to be of type "' + type + '" but found: ' + (typeof value);
             msg += '. Allowed keys are: ' + _.keys(Class.types).join(", ");
-            Class.error(new Class.TypeError(msg, property, value, type));
+            throw new Class.TypeError(msg, property, value, type);
             return;
           }
         } else {
@@ -340,7 +336,7 @@
             var isString = _.isString(check);
             if (!check || isString) {
               var msg = isString ? check : 'Validation for property "' + property + '" with value "' + value + '" failed';
-              Class.error(new Class.ValidationError(msg, property, value));
+              throw new Class.ValidationError(msg, property, value);
               return;
             }
           } else {

@@ -432,12 +432,12 @@ or use it for validation:
  * 0.6.1 (2012/7/29, not yet released)
   * Improved ECMA5 property support
   * Do not set the same value for a property twice
+  * Removed Class.error handling from property system
   * Bugfixes
  * 0.6 (2012/7/28, published to npm)
   * Splitted up files
   * Use grunt to build project
   * Interfaces can now have parameter checks
-  * API & Feature freeze for 1.0
  * 0.5.2 (2012/7/27, published to npm)
   * Added node tests
  * 0.5.1 (2012/7/27, published to npm)
@@ -479,6 +479,7 @@ or use it for validation:
 
  * If you have a feature request or an issue please report it here: https://github.com/tjbutz/class.js/issues
  * If you have developed a plugin for class.js please let me know. I will list the plugin on this page.
+ * If you use class.js in your project please let me know. I will list the project on this page.
 
 ## ToDo for 1.0
 
