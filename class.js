@@ -10,7 +10,7 @@
   var _Class = root.Class;
 
   var Class;
-  if (typeof exports !== 'undefined') {
+  if (!_.isUndefined(exports)) {
     Class = exports;
   } else {
     Class = root.Class = {};
@@ -76,7 +76,7 @@
       // definitons are called in order they were added
       if (definition) {
         _.each(this.definition, function(key) {
-          if (typeof definition[key] !== "undefined") {
+          if (!_.isUndefined(definition[key])) {
             this[key].call(this, clazz, definition[key]);
             delete definition[key]; // Clean up memory
           }
@@ -191,7 +191,7 @@
       }
       for (var property in properties) {
         var setter = getPropertyMethodName("set", property, visibility);
-        if (this[setter] !== undefined) {
+        if (!_.isUndefined(this[setter])) {
           set(this, setter, properties[property]);
         } else {
           throw new Error('No public set method for property "' + property + '" found.');
@@ -226,7 +226,7 @@
     // add "is" function for boolean
     if (definition.type === "Boolean") {
       var is = getPropertyMethodName("is", property, getPropertyVisibility(definition, "is"));
-      proto[is] = createIs(property, definition, getter, setter);
+      proto[is] = createIs(getter);
     }
   };
 
@@ -245,7 +245,7 @@
     return function() {
       this.$$properties = this.$$properties || {};
 
-      if (typeof definition.init !== "undefined") {
+      if (!_.isUndefined(definition.init)) {
         var init = definition.init;
         delete definition.init;
         set(this, setter, init);
@@ -270,9 +270,9 @@
 
       // add format function
       if (definition.format) {
-        var func = _.isString(definition.format) ? this[definition.format] : definition.format;
-        if (func) {
-          value = func.call(this, value, old, property);
+        var format = getMethod(this, definition.format);
+        if (format) {
+          value = format.call(this, value, old, property);
         } else {
           throw new Error('Format method "' + definition.format + '" for property "' + property + '" not available.');
         }
@@ -310,7 +310,7 @@
         }
 
         _.each(validate, function(validator) {
-          validator = _.isString(validator) ? this[validator] : validator;
+          validator = getMethod(this, validator);
           if (validator) {
             var check = validator.call(this, value, old, property);
             // Feature: when a string is returned, validation is failed and we use it as the error message
@@ -331,9 +331,9 @@
 
       // add apply method
       if (definition.hasOwnProperty("apply")) {
-        var func = _.isString(definition.apply) ? this[definition.apply] : definition.apply;
-        if (func) {
-          func.call(this, value, old, property);
+        var apply = getMethod(this, definition.apply);
+        if (apply) {
+          apply.call(this, value, old, property);
         } else {
           throw new Error('Apply method "' + definition.apply + '" for property "' + property + '" not available.');
         }
@@ -357,7 +357,13 @@
     };
   };
 
-  var createIs = function(property, definition, getter, setter) {
+
+  var getMethod = function(obj, method) {
+    return _.isString(method) ? obj[method] : method;
+  };
+
+
+  var createIs = function(getter) {
     return function() {
       return get(this, getter);
     };
@@ -425,7 +431,7 @@
      var inter = _.isFunction(inter) ? inter.prototype : inter;
      for (var name in inter) {
        var method = clazz.prototype[name];
-       if (typeof method === 'undefined' || !_.isFunction(method)) {
+       if (_.isUndefined(method) || !_.isFunction(method)) {
          throw new Error('The Class does not implement the interface method "' + method + '"');
        } else if (_.isFunction(inter[name])) {
          clazz.prototype[name] = wrap(inter[name], method);
