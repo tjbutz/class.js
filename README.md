@@ -188,7 +188,7 @@ Class.define(superClass, {
   properties : {
     prop1 : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Simple property definition
     prop2 : {
-                type : "Number|Boolean|String|Object|Function|Array|Element|Regex" | Class, // Complex property definition
+                type : "Number|Boolean|String|Object|Function|Array|Element|Regex|Date" | Class, // Complex property definition
                 init : Mixed
                 format : "Function" | Function,
                 validate : "Function" | Function | ["Function"|Function],
