@@ -15,7 +15,7 @@ Simple (1.98KB minified & gzipped & all features) class system for JavaScript. D
     * Properties
       * getter / setter (Optional:Support for ECMA5 getter / setter)
       * visibility
-      * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, more can be added)
+      * type check (Class, Object, String, Number, Boolean, Function, Array, Element, Regex, Date, more can be added)
       * format value
       * validation
       * init value,
@@ -425,6 +425,9 @@ or use it for validation:
 
 ## Version History
 
+ * 0.6.2 (not yet released)
+  * Added "Date" type to properties
+  * Refactoring
  * 0.6.1 (2012/7/29, published to npm)
   * Improved ECMA5 property support
   * Do not set the same value for a property twice
