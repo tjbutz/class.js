@@ -1,4 +1,4 @@
-/*! class.js v0.6.1 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+/*! class.js v0.6.2 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
 
 (function() {
   "use strict";
@@ -10,13 +10,13 @@
   var _Class = root.Class;
 
   var Class;
-  if (!_.isUndefined(exports)) {
+  if (typeof exports !== 'undefined') {
     Class = exports;
   } else {
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.6.1';
+  Class.VERSION = '0.6.2';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -166,6 +166,7 @@
     "Function" : _.isFunction,
     "Object" : _.isObject,
     "Element" : _.isElement,
+    "Date" : _.isDate,
     "Regex" : _.isRegExp
   };
 

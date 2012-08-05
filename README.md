@@ -425,7 +425,7 @@ or use it for validation:
 
 ## Version History
 
- * 0.6.2 (not yet released)
+ * 0.6.2 (2012/8/5, published to npm)
   * Added "Date" type to properties
   * Refactoring
  * 0.6.1 (2012/7/29, published to npm)
