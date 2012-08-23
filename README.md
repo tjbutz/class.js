@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/tjbutz/class.js.png)](http://travis-ci.org/tjbutz/class.js)
 class.js
 ========
 
