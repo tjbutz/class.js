@@ -57,7 +57,7 @@ var MyCompany = Company.extend({
   namespace : "my.cool.Company",
 
   constructor : function() {
-    Company.apply(this, arguments);
+    this.__super__.apply(this, arguments);
     this.setName("My Company"); 
     this._setStreet("Some Street", false);
     this.setCity(null);

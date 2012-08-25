@@ -97,7 +97,7 @@ test("Explicit constructor call", function () {
 
   var MyClass = Class.define(SuperClass, {
       constructor : function(name) {
-        SuperClass.apply(this, arguments);
+        this.__super__.apply(this, arguments);
       }
   });
 

@@ -111,7 +111,7 @@ var MyCompany = Company.extend({
   namespace : "my.cool.Company",
 
   constructor : function() {
-    Company.apply(this, arguments);
+    this.__super__.apply(this, arguments);
     this.setName("My Company"); 
     this._setStreet("Some Street", false);
     this.setCity(null);
@@ -428,6 +428,9 @@ or use it for validation:
 
 ## Version History
 
+ * 0.7.0 (2012/8/26, published to npm)
+  * Enhanced __super__ functionality 
+  * Bugfixes
  * 0.6.2 (2012/8/5, published to npm)
   * Added "Date" type to properties
   * Refactoring

@@ -1,4 +1,4 @@
-/*! class.js v0.6.2 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+/*! class.js v0.7.0 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
 
 (function() {
   "use strict";
@@ -16,7 +16,7 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.6.2';
+  Class.VERSION = '0.7.0';
   Class.root = root;
 
   Class.noConflict = function() {
@@ -52,11 +52,16 @@
           throw new Error("Use new keyword to create a new instance or call/apply class with right scope");
         }
         Class.onBeforeInstantiation && Class.onBeforeInstantiation(this);
+        
+        var temp = this.__super__;
+        this.__super__ = superClass;
+
         if (constructor) {
           constructor.apply(this, arguments);
         } else if (superClass) {
           superClass.apply(this, arguments);
         }
+        this.__super__ = temp;
         Class.onAfterInstantiation && Class.onAfterInstantiation(this);
       };
 
@@ -85,7 +90,26 @@
           throw new Error("Unknown key in definition: " + _.keys(definition).join(", ") + ". Allowed keys are: " + this.definition.join(", ")); 
         }     
       }
-      
+
+
+      if (superClass) {
+        var proto = clazz.prototype;
+        for (var name in proto) {
+          var func = proto[name];
+          var superFunc = superClass.prototype[name];
+          if (_.isFunction(func) && _.isFunction(superFunc)) {
+            proto[name] = (function(name, func) {
+              return function() {
+                var temp = this.__super__;
+                this.__super__ = superClass.prototype;
+                var value = func.apply(this, arguments);
+                this.__super__ = temp;
+                return value;
+              };
+            })(name, func);
+          }
+        }
+      }
 
       // provide extend method for inheritance
       clazz.extend = this._extend;
@@ -288,7 +312,7 @@
       var type = definition.type;
       var skip = _.isNull(value) && definition.nullable === true;
       if (!skip && type) {
-        var assert = _.isFunction(type) ? instaneOf : Class.types[type];
+        var assert = _.isFunction(type) ? instanceOf : Class.types[type];
         if (assert) {
           if (!assert.call(this, value)) {
 
@@ -390,7 +414,7 @@
     }
   });
 
-  var instaneOf = function(obj) {
+  var instanceOf = function(obj) {
     return this instanceof obj;
   };
 
