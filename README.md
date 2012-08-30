@@ -429,7 +429,7 @@ or use it for validation:
 ## Version History
 
  * 0.7.0 (2012/8/26, published to npm)
-  * Enhanced __super__ functionality
+  * Enhanced ```__super__``` functionality
   * node.js example
   * Bugfixes
  * 0.6.2 (2012/8/5, published to npm)
