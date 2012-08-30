@@ -486,7 +486,3 @@ or use it for validation:
  * If you have a feature request or an issue please report it here: https://github.com/tjbutz/class.js/issues
  * If you have developed a plugin for class.js please let me know. I will list the plugin on this page.
  * If you use class.js in your project please let me know. I will list the project on this page.
-
-## ToDo for 1.0
-
- * Examples
