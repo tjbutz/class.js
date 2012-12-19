@@ -1,4 +1,4 @@
-/*! class.js v0.7.0 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+/*! class.js v0.7.1 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
 
 (function() {
   "use strict";
@@ -24,7 +24,7 @@
     return this;
   };
 
-  var tempConstructor = function() {};
+  var TempConstructor = function() {};
 
   _.extend(Class, {
     
@@ -68,11 +68,11 @@
       // inheritance
       if (superClass) {
         // use the temp constr to avoid cunstructor call of super class
-        tempConstructor.prototype = superClass.prototype;
+        TempConstructor.prototype = superClass.prototype;
         // inherit
-        clazz.prototype = new tempConstructor();
+        clazz.prototype = new TempConstructor();
         // fix the constructor
-        clazz.constructor = clazz;
+        clazz.prototype.constructor = clazz;
         // remember the super class for calls in overridden methods
         clazz.prototype.__super__ = superClass.prototype;
       }
