@@ -428,7 +428,7 @@ or use it for validation:
 
 ## Version History
 
- * 0.7.1 (2012/12/19, not published to npm)
+ * 0.7.1 (2012/12/19, published to npm)
   * Fixed constructor after inheritance
  * 0.7.0 (2012/8/26, published to npm)
   * Enhanced ```__super__``` functionality
