@@ -1,0 +1,21 @@
+{
+  "name": "classjs",
+  "version": "0.7.1",
+  "main": [
+    "./class.js"
+  ],
+  "dependencies": {
+    "underscore": ">=1.0"
+  },
+  "ignore": [
+    "examples",
+    "lib",
+    "node_modules",
+    "test",
+    ".*",
+    "*.json",
+    "*.md",
+    "*.txt",
+    "grunt.js"
+  ]
+}
