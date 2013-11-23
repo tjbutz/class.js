@@ -167,9 +167,10 @@ The tests are located in the ```test``` folder. With the index*.html files you c
 ## API
 
 ```js
-Class.define(superClass, definition)
+Class.define(name, superClass, definition)
 ```
 
+  * name: The name of the class (optional)
   * superClass: Class (optional)
   * definition: Object (optional)
 
@@ -177,7 +178,7 @@ Defines a new class.
 
 ```js
 
-Class.define(superClass, {
+Class.define(name, superClass, {
   namespace : String,
 
   singleton : true|false,
@@ -223,9 +224,10 @@ Class.define(superClass, {
 ________________________________________________________________________________________________________________________
 
 ```js
-SomeClass.extend(definition)
+SomeClass.extend(name, definition)
 ```
 
+  * name: The name of the class (optional)
   * definition: Object (optional) (see Class.extend for more details)
 
 The ```extend``` method is added automatically to every created Class. Extends from the given class.
@@ -428,6 +430,9 @@ or use it for validation:
 
 ## Version History
 
+ * 0.8.0 (2013/11/23, published to npm)
+  * Named Classes
+  * Namespace can now have a different context
  * 0.7.1 (2012/12/19, published to npm)
   * Fixed constructor after inheritance
  * 0.7.0 (2012/8/26, published to npm)
