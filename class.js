@@ -1,4 +1,4 @@
-/*! class.js v0.7.1 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
+/*! class.js v0.8.0 https://github.com/tjbutz/class.js | License: https://github.com/tjbutz/class.js/blob/master/LICENSE */
 
 (function() {
   "use strict";
@@ -16,8 +16,9 @@
     Class = root.Class = {};
   }
 
-  Class.VERSION = '0.7.0';
+  Class.VERSION = '0.8.0';
   Class.root = root;
+  Class.useName = true;
 
   Class.noConflict = function() {
     root.Class = _Class;
@@ -25,14 +26,27 @@
   };
 
   var TempConstructor = function() {};
+  var invalidName = /\(/g;
 
   _.extend(Class, {
     
     // Extension point for the class definition
     definition : [],
 
-    define : function(superClass, definition) {
-      if (!_.isFunction(superClass)) {
+    define : function(name, superClass, definition) {
+      
+      // map params
+      if (name && !_.isString(name)) {
+        if (_.isFunction(name)) {
+          definition = superClass;
+          superClass = name;
+        } else {
+          definition = name;
+        }
+        name = null;
+      }
+
+      if (superClass && !_.isFunction(superClass)) {
         definition = superClass;
         superClass = null;
       }
@@ -53,17 +67,34 @@
         }
         Class.onBeforeInstantiation && Class.onBeforeInstantiation(this);
         
+        // remember the current super property
         var temp = this.__super__;
+        // set the right super class prototype
         this.__super__ = superClass;
 
+        // call the right constructor
         if (constructor) {
           constructor.apply(this, arguments);
         } else if (superClass) {
           superClass.apply(this, arguments);
         }
+        // reset the current super property
         this.__super__ = temp;
         Class.onAfterInstantiation && Class.onAfterInstantiation(this);
       };
+
+      // if it is a named class we need a trick to get a named function
+      // clazz.name = name does not work
+      if (name && Class.useName) {
+        // Check for a valid name so that no one can abuse the name...
+        if (!name.match(invalidName)) {
+          // create a named function that wraps the constructor 
+          // and call it directly with the constructor as argument.
+          clazz = new Function("constructor", "return function " + name + "() { constructor.apply(this, arguments); };")(clazz);  
+        } else {
+          throw new Error("Wrong name for class: " + name);
+        }
+      }
 
       // inheritance
       if (superClass) {
@@ -91,7 +122,7 @@
         }     
       }
 
-
+      // wrap functions to set the right super property
       if (superClass) {
         var proto = clazz.prototype;
         for (var name in proto) {
@@ -100,9 +131,12 @@
           if (_.isFunction(func) && _.isFunction(superFunc)) {
             proto[name] = (function(name, func) {
               return function() {
+                // remember the current super property
                 var temp = this.__super__;
+                // set the right super class prototype
                 this.__super__ = superClass.prototype;
                 var value = func.apply(this, arguments);
+                // reset the current super property
                 this.__super__ = temp;
                 return value;
               };
@@ -120,8 +154,8 @@
     },
     
     
-    _extend : function(definition) {
-      return Class.define(this, definition);
+    _extend : function(name, definition) {
+      return Class.define(name, this, definition);
     }
   });
 
@@ -132,14 +166,14 @@
   var _ = this._;
 
   Class.definition.push("namespace");
-  Class.namespace = function(clazz, namespace) {
+  Class.namespace = function(clazz, namespace, context) {
     if (_.isString(clazz)) {
       var tempClass = namespace;
       namespace = clazz;
       clazz = tempClass;
     }
     namespace = namespace.split(".");
-    var root = this.root;
+    var root = context || this.root;
     if (namespace.length > 0) {
       var className = namespace.pop();
       _.each(namespace, function(part) {
@@ -394,7 +428,7 @@
     };
   };
 
-  var ValidationError = Class.ValidationError = Class.define(Error, {
+  var ValidationError = Class.ValidationError = Class.define("ValidationError", Error, {
     constructor : function(message, property, value) {
       this.name = "ValidationError";
       this.message = message || "Validation Error";
@@ -404,7 +438,7 @@
   });
 
 
-  var TypeError = Class.TypeError = ValidationError.extend({
+  var TypeError = Class.TypeError = ValidationError.extend("TypeError", {
     constructor : function(message, property, value, type) {
       ValidationError.apply(this, arguments);
 

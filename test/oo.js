@@ -78,6 +78,18 @@ test("Inheritance by extend", function () {
   equal(obj.superMethod(), true, "Super method returns the right value");
 });
 
+test("Class define with name", function () {
+  var SuperClass = Class.define("MySuperClass", {
+    members : {
+      superMethod : function() {
+        return true;
+      }
+    }
+  });
+
+  ok(SuperClass, "Class defined without errors");
+});
+
 test("Implicit constructor call", function () {
   var SuperClass = function(name) {
     this.name = name;
